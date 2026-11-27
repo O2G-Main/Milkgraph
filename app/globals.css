@@ -831,11 +831,10 @@ button.recommendation-saving { min-height: 36px; }
 .kg-label { font-size: 11px; font-weight: 500; fill: var(--color-on-surface); paint-order: stroke; stroke: var(--color-canvas); stroke-width: 3px; pointer-events: none; }
 .kg-key { display: inline-block; width: 10px; height: 10px; flex-shrink: 0; }
 .kg-icon { color: #fff; pointer-events: none; }
-.kg-mutu .kg-icon { color: var(--color-on-surface); }
 .kg-chip { display: inline-grid; place-items: center; width: 22px; height: 22px; flex-shrink: 0; color: #fff; border-radius: 6px; }
 .kg-chip.kg-asal, .kg-chip.kg-lot { border-radius: 50%; }
 .kg-chip.kg-asal { background: var(--color-primary); }
-.kg-chip.kg-mutu { background: var(--color-accent-fill); color: var(--color-on-surface); }
+.kg-chip.kg-mutu { background: var(--color-accent-fill); }
 .kg-chip.kg-proses { background: var(--color-surface-inverse); }
 .kg-chip.kg-lot { background: var(--color-on-surface-muted); }
 .kg-type { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; }
