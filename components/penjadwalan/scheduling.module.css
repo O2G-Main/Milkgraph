@@ -82,11 +82,16 @@
   .calendarPanel { grid-template-columns: minmax(0, 1fr); }
 }
 
-.days .detailLink { display: inline-flex; align-items: center; gap: 4px; color: var(--color-primary); font-size: 15px; font-weight: 550; }
+.days .detailLink { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 16px; border: 1px solid var(--color-primary); border-radius: var(--radius-full); background: var(--color-surface); color: var(--color-primary); font-size: 15px; font-weight: 600; white-space: nowrap; transition: background-color 180ms var(--ease), color 180ms var(--ease); }
+.days button:is(:hover, :focus-visible) .detailLink, .days .selected .detailLink { background: var(--color-primary); color: var(--color-on-primary); }
 @media (max-width: 640px) {
   .days button { grid-template-columns: 28px minmax(0, 1fr) auto; }
   .days .rowSummary { grid-column: 2; }
   .days .detailLink { grid-column: 3; grid-row: 1 / span 2; }
+}
+@media (max-width: 380px) {
+  .days button { grid-template-columns: 28px minmax(0, 1fr); }
+  .days .detailLink { grid-column: 2; grid-row: 3; justify-self: start; }
 }
 
 .rowSummary, .dayCondition { display: grid; gap: 4px; min-width: 0; }

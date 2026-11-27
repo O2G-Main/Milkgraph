@@ -77,6 +77,24 @@ try {
     const daySize = await page.locator('[class*="days"] small').first().evaluate(el => parseFloat(getComputedStyle(el).fontSize));
     assert.ok(bodySize >= 15 && daySize >= 15, `Small scheduling text at ${width}: ${bodySize}/${daySize}`);
     if (process.env.QA_ARTIFACT_DIR) await page.screenshot({ path: `${process.env.QA_ARTIFACT_DIR}/penjadwalan-${width}.png`, fullPage: true });
+    if (width === 390) {
+      const row = page.getByRole('navigation', { name: 'Hari produksi' }).getByRole('button').first();
+      const action = row.locator('[class*="detailLink"]');
+      assert.match(await action.innerText(), /Lihat detail/);
+      const presentation = await action.evaluate(el => {
+        const style = getComputedStyle(el);
+        return { height: el.getBoundingClientRect().height, border: style.borderStyle, color: style.color, background: style.backgroundColor };
+      });
+      assert.ok(presentation.height >= 44 && presentation.border !== 'none' && presentation.background !== 'rgba(0, 0, 0, 0)',
+        `Detail action lacks visible button treatment: ${JSON.stringify(presentation)}`);
+      await action.click();
+      await page.getByRole('button', { name: 'Kembali ke kalender' }).waitFor();
+      await page.getByRole('button', { name: 'Kembali ke kalender' }).click();
+      await row.focus();
+      await page.keyboard.press('Enter');
+      await page.getByRole('button', { name: 'Kembali ke kalender' }).waitFor();
+      await page.getByRole('button', { name: 'Kembali ke kalender' }).click();
+    }
   }
   const count = page.locator('[class*="planSummary"] strong');
   await count.waitFor({ timeout: 20_000 });

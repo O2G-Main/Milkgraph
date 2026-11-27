@@ -128,7 +128,7 @@ export function SchedulingWorkspace({ initialDate, role, tools }: { initialDate:
         const volume = resource.data && !resource.error && !resource.loading ? scheduledVolume(resource.data.items) : null;
         return <button key={day} className={day === date ? styles.selected : ""} aria-current={day === date ? "date" : undefined}
           onClick={() => openDay(day)}><span>{dayName(day)}</span><strong>{dayNumber(day)}</strong>
-          <span className={styles.rowSummary}><small>{!resource.loading && !resource.error && resource.data ? `${new Set(uniqueSchedule(resource.data.items).map(row => row.batch_id)).size} batch · ` : ""}{resource.error ? "Gagal dimuat" : resource.loading ? "Memuat…" : liters(volume)}</small><DayConditionSummary date={day} /></span><span className={styles.detailLink}>Detail<Icon icon={ChevronRight} size={14} /></span></button>;
+          <span className={styles.rowSummary}><small>{!resource.loading && !resource.error && resource.data ? `${new Set(uniqueSchedule(resource.data.items).map(row => row.batch_id)).size} batch · ` : ""}{resource.error ? "Gagal dimuat" : resource.loading ? "Memuat…" : liters(volume)}</small><DayConditionSummary date={day} /></span><span className={styles.detailLink}>Lihat detail<Icon icon={ChevronRight} size={16} /></span></button>;
       })}
       </nav>
       </Card>
