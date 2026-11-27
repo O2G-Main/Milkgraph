@@ -21,6 +21,7 @@ import { MetricGrid } from "@/components/receiving/metric-grid";
 import { ASSETS } from "@/lib/assets";
 import { ExecKpis, MachineCard, ScheduleCard, SupplyCard, TargetCard, type ExecKpi, type StateSlice } from "./executive";
 import { API_MODE } from "@/lib/api/client";
+import { useResource } from "@/lib/api/resource";
 import { ExecutiveDashboardApi, ExecutiveKpis } from "./executive-api";
 import { BerandaApiAttention, BerandaApiHero, BerandaApiMenus } from "./beranda-api";
 import { ROLE_DASHBOARD_API } from "./role-api";
@@ -34,6 +35,9 @@ const forward = scenario.answers.find(a => a.id === "forward")!;
 export function Beranda() {
   const [source, setSource] = useState<string | null>(null);
   const demo = useDemo();
+  const metaRes = useResource<{ date?: string; now?: string }>(API_MODE ? "/meta" : null);
+  const dateLabel = API_MODE ? (metaRes.data?.date ?? "Hari ini") : scenario.date;
+  const nowLabel = API_MODE ? (metaRes.data?.now ? `${metaRes.data.now} WIB` : "data server") : `snapshot ${scenario.now}`;
   const me = { ...(ROLES[demo.role] ?? { label: demo.role, user: "", initials: "", focus: "" }), user: demo.users.find(u => u.id === demo.account)?.name ?? ROLES[demo.role]?.user ?? "" };
   const broken = violations(plan, "before", demo.limits);
   const after = violations(plan, "after", demo.limits);
@@ -292,14 +296,14 @@ export function Beranda() {
 
   return <div className="page-enter">
     <PageHeading title={isManager ? "Executive Dashboard" : "Beranda"} subtitle={isManager
-      ? `Halo, ${me.user.split(" ")[0]}. Ringkasan pasokan, penggunaan mesin, jadwal, dan pencapaian target Shift Siang, ${scenario.date}, snapshot ${scenario.now}.`
+      ? `Halo, ${me.user.split(" ")[0]}. Ringkasan pasokan, penggunaan mesin, jadwal, dan pencapaian target Shift Siang, ${dateLabel}, ${nowLabel}.`
       : isPlanner
-      ? `Halo, ${me.user.split(" ")[0]}. Kelayakan rencana, jadwal, dan pasokan Shift Siang, ${scenario.date}, snapshot ${scenario.now}.`
-      : isReceiving ? `Halo, ${me.user.split(" ")[0]}. RT di plant, bay, tangki, dan kedatangan berikutnya Shift Siang, ${scenario.date}, snapshot ${scenario.now}.`
-      : isLab ? `Halo, ${me.user.split(" ")[0]}. Sampel RT dan batch yang perlu diperiksa Shift Siang, ${scenario.date}, snapshot ${scenario.now}.`
-      : isQa ? `Halo, ${me.user.split(" ")[0]}. Keputusan rilis susu, mutu barang jadi, hold, dan selisih bahan Shift Siang, ${scenario.date}, snapshot ${scenario.now}.`
-      : isOperator ? `Halo, ${me.user.split(" ")[0]}. Order, mesin, dan downtime di lini ${(assigned ?? []).filter(a => a.startsWith("F")).join(", ")} Shift Siang, ${scenario.date}, snapshot ${scenario.now}.`
-      : `Halo, ${me.user.split(" ")[0]}. Ringkasan Shift Siang, ${scenario.date}, snapshot ${scenario.now}.`} />
+      ? `Halo, ${me.user.split(" ")[0]}. Kelayakan rencana, jadwal, dan pasokan Shift Siang, ${dateLabel}, ${nowLabel}.`
+      : isReceiving ? `Halo, ${me.user.split(" ")[0]}. RT di plant, bay, tangki, dan kedatangan berikutnya Shift Siang, ${dateLabel}, ${nowLabel}.`
+      : isLab ? `Halo, ${me.user.split(" ")[0]}. Sampel RT dan batch yang perlu diperiksa Shift Siang, ${dateLabel}, ${nowLabel}.`
+      : isQa ? `Halo, ${me.user.split(" ")[0]}. Keputusan rilis susu, mutu barang jadi, hold, dan selisih bahan Shift Siang, ${dateLabel}, ${nowLabel}.`
+      : isOperator ? `Halo, ${me.user.split(" ")[0]}. Order, mesin, dan downtime di lini ${(assigned ?? []).filter(a => a.startsWith("F")).join(", ")} Shift Siang, ${dateLabel}, ${nowLabel}.`
+      : `Halo, ${me.user.split(" ")[0]}. Ringkasan Shift Siang, ${dateLabel}, ${nowLabel}.`} />
     {/* Manager: infografis. Mode API sepenuhnya dari GET /dashboard/executive, mode lokal dari data demo. */}
     {isManager && API_MODE ? <ExecutiveDashboardApi attention={<BerandaApiAttention role={demo.role} title="Perlu perhatian" />} />
     : API_MODE && RoleDashboard ? <RoleDashboard attention={<BerandaApiAttention role={demo.role} title={attentionTitle} subtitle={attentionSubtitle} />} />

@@ -43,7 +43,7 @@ export function RiwayatProduksi({ lot }: { lot?: string }) {
     date: g.jendela_mulai.slice(0, 10), end: g.jendela_selesai.slice(11, 16).replace(":", "."),
     packs: 0, farm: "Prepared Product Release", chain: [], qc: null,
   }));
-  const allOutputs = [...OUTPUTS, ...histOutputs];
+  const allOutputs = API_MODE ? histOutputs : [...OUTPUTS, ...histOutputs];
 
   const list = matchOutputs(allOutputs, filters);
   const output = list.find(o => o.id === picked) ?? list[0];

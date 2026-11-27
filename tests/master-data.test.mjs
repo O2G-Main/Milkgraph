@@ -17,7 +17,7 @@ test('sidebar groups production, equipment and products under Master without mov
   const nav = read('lib/nav.ts');
   const operational = nav.match(/\{ label: "Operasional"[^\n]+/s)?.[0] ?? '';
   const master = nav.match(/\{ label: "Master"[^\n]+/s)?.[0] ?? '';
-  for (const href of ['/penjadwalan', '/qc-produk']) assert.ok(operational.includes(`href: "${href}"`), href);
+  for (const href of ['/penjadwalan', '/kondisi-pabrik', '/qc-produk']) assert.ok(operational.includes(`href: "${href}"`), href);
   for (const href of ['/produksi', '/alat', '/produk']) {
     assert.ok(master.includes(`href: "${href}"`), `Master missing ${href}`);
     assert.ok(!operational.includes(`href: "${href}"`), `Operasional still contains ${href}`);

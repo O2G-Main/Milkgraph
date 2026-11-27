@@ -84,7 +84,7 @@ try {
   assert.equal(await page.locator(".scene-tag.crit").count(), 0);
   report.push("Simulasi 3D: bottlenecks before, none critical after recommendation: PASS");
   assert.equal(await page.locator("#desktop-navigation .nav-list a.nav-item").count(), 8);
-  const tabbed = { receiving: "Penerimaan", lab: "Penerimaan", produksi: "Master", alat: "Master", produk: "Master", "qc-produk": "Operasional", "riwayat-produksi": "Traceability", hold: "Traceability", graph: "Traceability", "sumber-data": "Pengaturan", pengguna: "Pengaturan" };
+  const tabbed = { receiving: "Penerimaan", lab: "Penerimaan", produksi: "Master", "kondisi-pabrik": "Operasional", alat: "Master", produk: "Master", "qc-produk": "Operasional", "riwayat-produksi": "Traceability", hold: "Traceability", graph: "Traceability", "sumber-data": "Pengaturan", pengguna: "Pengaturan" };
   for (const [route, menu] of Object.entries(tabbed)) {
     const response = await page.goto(`${root}/${route}`);
     assert.equal(response.status(), 200, route);

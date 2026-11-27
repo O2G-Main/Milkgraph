@@ -11,7 +11,7 @@ try {
   await page.getByRole('button', { name: 'Masuk', exact: true }).click();
   await page.waitForURL(`${root}/`);
   assert.equal(await page.locator('#desktop-navigation .nav-list a.nav-item').count(), 8);
-  for (const [route, group] of [['/penjadwalan', 'Operasional'], ['/qc-produk', 'Operasional'], ['/produksi', 'Master'], ['/alat', 'Master'], ['/produk', 'Master']]) {
+  for (const [route, group] of [['/penjadwalan', 'Operasional'], ['/kondisi-pabrik', 'Operasional'], ['/qc-produk', 'Operasional'], ['/produksi', 'Master'], ['/alat', 'Master'], ['/produk', 'Master']]) {
     await page.goto(`${root}${route}`);
     await page.getByRole('heading', { level: 1 }).waitFor();
     assert.equal(await page.locator('#desktop-navigation .nav-item.active').getAttribute('aria-label'), group, route);

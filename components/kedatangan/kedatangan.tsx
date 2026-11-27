@@ -152,7 +152,7 @@ function ArrivalForm({ value, isNew, taken, farmOptions, onClose }: { value: Arr
     try {
       if (isNew) await apiSend("POST", PATH, arrivalCreateBody(row), role);
       else await apiSend("PUT", `${PATH}/${encodeURIComponent(value.apiId ?? id)}`, arrivalUpdateBody(row), role);
-      invalidateResources([PATH, "/audit"]);
+      invalidateResources([PATH, "/dashboard/executive", "/site/bottlenecks", "/audit"]);
       onClose();
     } catch (err) {
       const status = (err as { status?: number }).status;

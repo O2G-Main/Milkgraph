@@ -28,14 +28,14 @@ const tools = [
   { href: "/alat", label: "Alat", detail: "Lihat spesifikasi Greenfields, catat status, dan tinjau downtime." },
 ];
 
-export function ProductionSettings({ role }: { role: RoleId }) {
+export function ProductionSettings({ role, showTools = true, origin = "Alat" }: { role: RoleId; showTools?: boolean; origin?: string }) {
   const { limits: demoLimits } = useDemo();
   const saved = useResource<Limits>(API_MODE ? "/limits" : null);
   const schema = useResource<LimitsSchema>(API_MODE ? "/limits/schema" : null);
   const current = API_MODE ? saved.data : demoLimits;
   const session = useResource<ProductionSession>(API_MODE ? "/session" : null);
   const allowed = API_MODE
-    ? session.data?.role === role && session.data.permissions.includes("constraint.edit")
+    ? !session.error && !session.loading && session.data?.role === role && session.data.permissions.includes("constraint.edit")
     : can(role, "constraint.edit");
   const availableTools = tools.filter(tool => canOpen(role, tool.href, tool.tab ?? tool.href));
   const ranges = schema.data?.flatMap(group => group.params) ?? [];
@@ -65,9 +65,22 @@ export function ProductionSettings({ role }: { role: RoleId }) {
     setError(null);
     setNotice(false);
     try {
+      if (API_MODE) {
+        const latestSession = await apiGet<ProductionSession>("/session", role);
+        if (latestSession.role !== role || !latestSession.permissions.includes("constraint.edit")) {
+          await session.reload();
+          throw new Error("Izin mengubah batas operasional sudah tidak tersedia.");
+        }
+      }
       const latest = API_MODE ? await apiGet<Limits>("/limits", role) : current;
-      await setLimits({ ...latest, ...patch }, "Pengaturan batas dari halaman Alat");
-      if (API_MODE) await saved.reload();
+      await setLimits({ ...latest, ...patch }, `Pengaturan batas dari halaman ${origin}`);
+      if (API_MODE) {
+        const verified = await apiGet<Limits>("/limits", role);
+        await saved.reload();
+        if (Object.entries(patch).some(([key, value]) => verified[key as Setting] !== value)) {
+          throw new Error("Perubahan sudah dikirim, tetapi nilai backend belum sesuai. Muat ulang dan periksa sebelum menyimpan lagi.");
+        }
+      }
       setDraft({});
       setNotice(true);
     } catch (err) {
@@ -81,10 +94,12 @@ export function ProductionSettings({ role }: { role: RoleId }) {
     <Card>
       <SectionTitle title="Batas operasional"
         subtitle={API_MODE ? "Pengaturan global perencanaan produksi yang disimpan ke server." : "Pengaturan global untuk simulasi lokal."} />
-      {loadError ? <p className="crit-text" role="alert">Gagal memuat pengaturan: {loadError.message}</p>
+      {loadError ? <div role="alert"><p className="crit-text">Gagal memuat pengaturan: {loadError.message}</p><button className="button secondary" onClick={() => { void saved.reload(); void schema.reload(); }}>Coba lagi</button></div>
       : !current || (API_MODE && !schema.data) ? <p className="muted" role="status">Memuat pengaturan produksi…</p>
       : !fields.length ? <p className="muted">Server belum menyediakan parameter pengaturan ini.</p>
       : <form className="schedule-form" onSubmit={save}>
+        {API_MODE && session.error && <p className="crit-text" role="alert">Izin backend gagal dimuat. Pengaturan hanya dapat dibaca. <button type="button" className="text-link" onClick={() => void session.reload()}>Periksa ulang izin</button></p>}
+        {API_MODE && !session.data && !session.error && <p className="small muted" role="status">Memeriksa izin pengaturan…</p>}
         <div className="production-settings-grid">
           {fields.map(({ key, label, min, max, step }) => (
             <label key={key}>
@@ -108,7 +123,7 @@ export function ProductionSettings({ role }: { role: RoleId }) {
       </form>}
     </Card>
 
-    {availableTools.length > 0 && <Card>
+    {showTools && availableTools.length > 0 && <Card>
       <SectionTitle title="Kelola sistem produksi" />
       <ul className="attention-list">{availableTools.map(tool => <li key={tool.href}>
         <Link className="attention-item" href={tool.href}>

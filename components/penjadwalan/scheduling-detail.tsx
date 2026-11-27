@@ -33,6 +33,7 @@ export function SchedulingDetail({ row, role, onClose }: { row: ProductionSchedu
       </li>)}</ul>}
     </Card>
     <p className="small muted scheduling-note">Perubahan batch tersimpan dan pemindahan sisa target tersedia setelah layanan penjadwalan mendukung penyimpanan perubahan tersebut.</p>
+    {canSee(role, "/kondisi-pabrik") && <Link href={`/kondisi-pabrik?date=${row.production_date}&batch=${encodeURIComponent(row.batch_id)}`} className="button secondary" onClick={onClose}>Lihat kondisi alat batch</Link>}
     {canSee(role, "/rencana") && <Link href="/rencana" className="button primary" onClick={() => {
       planning.chooseDate(row.production_date); planning.chooseBatch(row.batch_id); onClose();
     }}>Periksa kelayakan & rekomendasi</Link>}

@@ -5,7 +5,7 @@ import { Equipment, KIND_LABEL } from "@/components/trace/equipment";
 import type { Asset } from "@/lib/assets";
 
 export type AssetNode = Node<Asset & { picked: boolean; onPick: (id: string) => void; badge?: string }, "asset">;
-export type StageNode = Node<{ label: string; count: number }, "stage">;
+export type StageNode = Node<{ label: string; count: number; unit?: string }, "stage">;
 
 /** Kartu alat. Diklik atau ditekan Enter untuk membuka panel info alat. */
 function AssetCard({ data }: NodeProps<AssetNode>) {
@@ -22,7 +22,7 @@ function AssetCard({ data }: NodeProps<AssetNode>) {
 }
 
 function StageHeader({ data }: NodeProps<StageNode>) {
-  return <div className="flow-stage"><span>{data.label}<small>{data.count} alat</small></span></div>;
+  return <div className="flow-stage"><span>{data.label}<small>{data.count} {data.unit || "alat"}</small></span></div>;
 }
 
 export const nodeTypes = { asset: AssetCard, stage: StageHeader };

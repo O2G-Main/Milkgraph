@@ -105,11 +105,11 @@ export const HIDDEN_PAGES: Partial<Record<RoleId, string[]>> = {
   ],
   manager: ["/sumber-data", "/pengguna", "/role-akses"],
   qa: [
-    "/simulasi", "/kedatangan", "/receiving", "/produksi", "/kondisi-alat", "/master-data",
+    "/simulasi", "/kedatangan", "/receiving", "/produksi", "/kondisi-pabrik", "/kondisi-alat", "/master-data",
     "/penjadwalan", "/rencana/alur", "/rencana/upgrade", "/rencana", "/sumber-data", "/pengguna", "/role-akses",
   ],
   lab: [
-    "/simulasi", "/kedatangan", "/transfer", "/produksi", "/kondisi-alat", "/qc-produk", "/master-data",
+    "/simulasi", "/kedatangan", "/transfer", "/produksi", "/kondisi-pabrik", "/kondisi-alat", "/qc-produk", "/master-data",
     "/penjadwalan", "/aturan-produksi", "/rencana/alur", "/rencana/upgrade", "/rencana",
     "/riwayat-produksi", "/graph", "/hold", "/sumber-data", "/pengguna", "/role-akses",
   ],

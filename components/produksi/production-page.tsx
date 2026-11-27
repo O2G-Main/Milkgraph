@@ -9,20 +9,22 @@ import { useDemo } from "@/lib/demo";
 import { dateInWib } from "@/lib/production-date";
 import { DemoProductionDay } from "./production-day";
 import { ProductionDayApi } from "./production-day-api";
+import { ProcessManagement } from "./process-management";
 import { PlantTopology } from "./plant-topology";
 
-type View = "daily" | "flow";
+type View = "daily" | "flow" | "process";
 
 export function ProductionPage({ initialDate }: { initialDate: string }) {
   const { role } = useDemo();
   const [date, setDate] = useState(initialDate);
   const [view, setView] = useState<View>("daily");
   return <div className="page-enter">
-    <PageHeading title="Produksi" subtitle={API_MODE ? "Periksa kecukupan volume susu per batch dan tinjau rekomendasi berdasarkan data produksi." : "Tinjau produksi harian dan alur pabrik menggunakan data simulasi lokal."} />
+    <PageHeading title="Produksi" subtitle={API_MODE ? "Periksa kecukupan volume susu per batch, tinjau alur pabrik, dan kelola batas operasional produksi." : "Tinjau produksi harian dan alur pabrik menggunakan data simulasi lokal."} />
     <div className="page-tabs production-tabs">
       <Toggle label="Bagian Produksi" value={view} onChange={setView} options={[
         { value: "daily", label: API_MODE ? "Prediksi pemenuhan" : "Produksi harian (demo)" },
         { value: "flow", label: "Alur pabrik" },
+        { value: "process", label: "Manajemen proses" },
       ]} />
     </div>
     <div className="production-stack">
@@ -39,6 +41,7 @@ export function ProductionPage({ initialDate }: { initialDate: string }) {
           : API_MODE ? <ProductionDayApi key={date} date={date} role={role} />
           : <DemoProductionDay date={date} role={role} />}
       </>}
+      {view === "process" && <ProcessManagement role={role} />}
       {view === "flow" && (API_MODE ? <PlantTopology /> : <Alur />)}
     </div>
   </div>;

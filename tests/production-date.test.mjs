@@ -1,10 +1,14 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { completedOnProductionDate, dateInWib } from "../lib/production-date.ts";
+import { DEFAULT_PRODUCTION_DATE, completedOnProductionDate, dateInWib } from "../lib/production-date.ts";
 
 test("tanggal Produksi berganti pada tengah malam WIB", () => {
   assert.equal(dateInWib(new Date("2026-11-27T16:59:59Z")), "2026-11-27");
   assert.equal(dateInWib(new Date("2026-11-27T17:00:00Z")), "2026-11-28");
+});
+
+test("tanggal awal Produksi memakai tanggal skenario berdata", () => {
+  assert.equal(DEFAULT_PRODUCTION_DATE, "2026-11-01");
 });
 
 test("hasil historis mengikuti tanggal selesai WIB", () => {

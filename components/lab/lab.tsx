@@ -72,7 +72,7 @@ export function Lab({ kind, lot, sample }: { kind: LabResult["kind"]; lot?: stri
   const unsampled = unsampledRts(rows, demo);
   const toCheck = rows.filter(r => pending(r) && !demo.labs[r.id]).length + unsampled.length;
   const entryOf = open ? demo.lab.entries[open.id] : undefined;
-  const editable = !!open && canRecord && !API_MODE && (open.kind === "qc-fg" || (open.status !== "lulus" && !open.decision && !demo.labs[open.id]));
+  const editable = !!open && (canRecord || (API_MODE && allowed)) && (open.kind === "qc-fg" || (open.status !== "lulus" && !open.decision && !demo.labs[open.id]));
   const metrics = intake
     ? [{ icon: TriangleAlert, label: "Perlu diperiksa", value: toCheck, unit: "sampel" }, { icon: FlaskConical, label: "Menunggu keputusan QA", value: waiting, unit: "sampel" }, { icon: CircleDashed, label: "Rata-rata tunggu lab", value: avgWait, unit: "menit" }]
     : [{ icon: FlaskConical, label: "Lot diuji", value: rows.length, unit: "lot" }, { icon: CircleX, label: "Out-of-spec", value: rows.filter(r => r.status === "positif").length, unit: "lot" }, { icon: CircleCheck, label: "Lulus", value: rows.filter(r => r.status === "lulus").length, unit: "lot" }];
@@ -95,7 +95,7 @@ export function Lab({ kind, lot, sample }: { kind: LabResult["kind"]; lot?: stri
 
   return <div className="page-enter">
     <PageHeading title={intake ? "Tes Lab" : "QC Barang Jadi"} subtitle={intake ? "Sampel road tanker dan batch tangki proses. Lab memasukkan hasil uji tiap parameter; RT baru masuk antrean bongkar setelah dirilis QA." : "Hasil QC lot barang jadi dari LIMS sebelum lot dikirim dari gudang."}>
-      {intake && canRecord && !API_MODE && <button className="button primary" onClick={() => setEntry("sampel")}><Icon icon={Plus} size={16} />Buat sampel{unsampled.length ? ` (${unsampled.length})` : ""}</button>}
+      {(canRecord || (API_MODE && allowed)) && <button className="button primary" onClick={() => setEntry("sampel")}><Icon icon={Plus} size={16} />Buat sampel{intake && unsampled.length ? ` (${unsampled.length})` : ""}</button>}
     </PageHeading>
     <div className="metrics-grid three">{metrics.map(m => <Card key={m.label} className="metric-card"><span className="metric-label"><Icon icon={m.icon} size={15} />{m.label}</span><p className="metric-value">{m.value}<span>{m.unit}</span></p></Card>)}</div>
     <div className="kg-layout">
@@ -130,7 +130,7 @@ export function Lab({ kind, lot, sample }: { kind: LabResult["kind"]; lot?: stri
     {dialog && open && <Modal title={dialog === "dirilis" ? `Rilis ${open.subject} ke receiving?` : `Tolak ${open.subject}?`} onClose={() => { setDialog(null); setSubmitError(null); }}><form onSubmit={submit}><Badge>Data simulasi</Badge><p className="dialog-summary">{dialog === "dirilis" ? `${open.subject} akan masuk antrean bongkar. Semua parameternya dalam batas.` : `${open.subject} tidak dibongkar dan dikembalikan ke pemasok. Tulis alasannya supaya keputusan ini bisa ditelusuri nanti.`}</p>{submitError && <p className="crit-text small">{submitError}</p>}<label className="field-label" htmlFor="lab-note">Catatan {dialog === "ditolak" ? "(wajib)" : "(opsional)"}</label><textarea id="lab-note" value={note} onChange={e => setNote(e.target.value)} required={dialog === "ditolak"} maxLength={500} placeholder={dialog === "ditolak" ? "Contoh: alcohol test positif pada uji ulang." : "Contoh: prioritaskan bongkar karena umur susu sudah 7 jam 20 menit."} /><div className="dialog-actions"><button type="button" className="button secondary" onClick={() => { setDialog(null); setSubmitError(null); }} disabled={submitting}>Batal</button><button className="button primary" disabled={submitting || (dialog === "ditolak" && !note.trim())}>{submitting ? "Memproses…" : (dialog === "dirilis" ? "Konfirmasi rilis" : "Konfirmasi penolakan")}<Icon icon={Check} size={16} /></button></div></form></Modal>}
     {intake && <LabWaitChart history={API_MODE ? (waitRes.data?.labHistory ?? []) : scenario.labHistory} avg={API_MODE ? (waitRes.data?.labSummary.avgMinutes ?? avgWait) : 52} delta={API_MODE ? (waitRes.data?.labSummary.deltaMinutes ?? 0) : 14} onSource={setSource} />}
     <SourceModal id={source} onClose={() => setSource(null)} />
-    {entry === "hasil" && open && <LabEntryDialog sample={open} onClose={() => setEntry(null)} />}
-    {entry === "sampel" && <NewSampleDialog samples={rows} onClose={() => setEntry(null)} />}
+    {entry === "hasil" && open && <LabEntryDialog sample={open} role={demo.role} onClose={() => setEntry(null)} />}
+    {entry === "sampel" && <NewSampleDialog kind={kind} samples={rows} role={demo.role} onClose={() => setEntry(null)} />}
   </div>;
 }

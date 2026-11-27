@@ -34,6 +34,7 @@ export interface ProductionAsset {
   asset_type: string;
   current_status: string | null;
   current_status_reason: string | null;
+  current_status_source?: string | null;
   current_status_observed_at: string | null;
 }
 
