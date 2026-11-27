@@ -1,21 +1,24 @@
 .page { display: grid; gap: 20px; min-width: 0; }
 .page > :global(.page-heading), .page > :global(.plan-links) { margin-bottom: 0; }
+.page :global(.page-heading p), .page :global(.section-heading p) { font-size: 14px; line-height: 1.5; }
+.page :global(.badge) { font-size: 12px; }
 .filters { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; margin: 12px 0 16px; border: 0; padding: 0; min-width: 0; }
 .field { display: grid; gap: 7px; min-width: 180px; max-width: 100%; font-size: 13px; font-weight: 500; flex: 1 1 200px; }
-.field input, .field select { min-height: 44px; padding: 10px 14px; border: 1px solid var(--color-border); border-radius: 12px; background: var(--color-surface); color: inherit; font: inherit; width: 100%; }
+.field input, .field select { min-height: 44px; padding: 10px 14px; border: 1px solid var(--color-border); border-radius: 12px; background: var(--color-surface); color: inherit; font: inherit; font-size: 16px; font-weight: 400; width: 100%; }
 .field input:focus-visible, .field select:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 .state { padding: 18px 0; color: var(--color-on-surface); }
 .state p { margin-bottom: 12px; }
-.page table { width: 100%; font-size: 13px; text-align: left; border-collapse: collapse; }
-.page th { color: var(--color-on-surface-muted); font-weight: 500; position: sticky; top: 0; background: var(--color-surface); z-index: 1; }
+.page table { width: 100%; font-size: 16px; line-height: 1.5; text-align: left; border-collapse: collapse; }
+.page th { color: var(--color-on-surface-muted); font-size: 16px; font-weight: 600; position: sticky; top: 0; background: var(--color-surface); z-index: 1; }
 .page th, .page td { padding: 14px 12px; border-bottom: 1px solid var(--color-border); vertical-align: top; }
-.page td { overflow-wrap: anywhere; min-width: 150px; }
-.page td p { margin: 6px 0 0; }
+.page td { overflow-wrap: anywhere; min-width: 150px; font-size: 16px; }
+.page td p { margin: 6px 0 0; font-size: 14px; }
+.page td :global(.mono), .page td :global(.button), .page td :global(.text-link) { font-size: 15px; }
 .page :global(.table-wrap) { overflow: auto; max-width: 100%; max-height: 640px; }
-.caption { text-align: left; padding: 8px 12px; color: var(--color-on-surface-muted); }
+.caption { text-align: left; padding: 8px 12px; font-size: 14px; color: var(--color-on-surface-muted); }
 .facts { margin-top: 10px; }
-.facts summary { cursor: pointer; color: var(--color-primary); min-height: 44px; padding: 10px 0; }
-.facts pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12px; max-width: 380px; max-height: 300px; overflow: auto; padding: 12px; background: var(--color-canvas); border-radius: 12px; }
+.facts summary { cursor: pointer; color: var(--color-primary); min-height: 44px; padding: 10px 0; font-size: 15px; font-weight: 500; }
+.facts pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; line-height: 1.5; max-width: 380px; max-height: 300px; overflow: auto; padding: 12px; background: var(--color-canvas); border-radius: 12px; }
 .decisions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 .decisions button { min-height: 44px; }
 .confirm { padding: 4px 24px 24px; }

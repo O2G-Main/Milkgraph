@@ -5,7 +5,10 @@
   gap: 16px;
 }
 .field { display: grid; flex: 1 1 260px; gap: 8px; }
+.field :global(.small) { font-size: 13px; }
 .result { display: grid; gap: 12px; margin-top: 20px; }
+.result > :global(.small) { font-size: 14px; line-height: 1.5; }
+.result :global(.badge) { font-size: 12px; }
 .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin: 0; }
-.facts dt { margin-bottom: 4px; }
-.facts dd { margin: 0; overflow-wrap: anywhere; }
+.facts dt { margin-bottom: 4px; font-size: 13px; }
+.facts dd { margin: 0; overflow-wrap: anywhere; font-size: 14px; }

@@ -1,0 +1,237 @@
+{
+  "branch": "fatir",
+  "commit": "687daad",
+  "workingTree": "includes uncommitted typography revisions",
+  "dataMode": "api-live-GET-only via local read-only proxy",
+  "devIndicatorHidden": true,
+  "screenshots": [
+    {
+      "route": "/",
+      "width": 390,
+      "filename": "beranda-390.png",
+      "mode": "api-live-GET-only",
+      "httpStatus": 200,
+      "heading": [
+        "Beranda"
+      ],
+      "mainExcerpt": "Beranda  Halo, Superadmin. Ringkasan Shift Siang, Rabu, 14 Oktober 2026, snapshot 14.42.  Sumber data terhubung 0 dari 6 6 belum terhubung Role terdaftar 8 role 0 role buatan, 13 h",
+      "state": "rendered",
+      "pageWidth": 390,
+      "bytes": 244832
+    },
+    {
+      "route": "/simulasi",
+      "width": 390,
+      "filename": "simulasi-390.png",
+      "mode": "api-live-GET-only",
+      "httpStatus": 200,
+      "heading": [
+        "Simulasi 3D"
+      ],
+      "mainExcerpt": "Simulasi 3D  Model plant dengan tata letak nyata. Di sini terlihat alur susu, kondisi bay dan tangki, dan lokasi bottleneck.  Buka rencana Kondisi tercatat · 1 Nov 2026 06.00 WIB K",
+      "state": "rendered",
+      "pageWidth": 390,
+      "bytes": 199249
+    },
+    {
+      "route": "/kedatangan",
+      "width": 390,
+      "filename": "kedatangan-390.png",
+      "mode": "api-live-GET-only",
+      "httpStatus": 200,
+      "heading": [
+        "Jadwal Kedatangan RT"
+      ],
+      "mainExcerpt": "Jadwal Kedatangan RT  Road tanker yang dijadwalkan, dalam perjalanan, dan sudah tiba. Keterlambatan = estimasi tiba dibanding target tiba.  Tambah jadwal RT Dalam perjalanan 0 RT T",
+      "state": "rendered",
+      "pageWidth": 390,
+      "bytes": 307644
+    },
+    {
+      "route": "/receiving",
+      "width": 390,
+      "filename": "receiving-390.png",
+      "mode": "api-live-GET-only",
+      "httpStatus": 200,
+      "heading": [],
+      "mainExcerpt": "Gagal memuat antrean truk: Screenshot capture is read-only.",
+      "state": "error-or-no-data",
+      "pageWidth": 390,
+      "bytes": 49968
+    },
+    {
+      "route": "/lab",
+      "width": 390,
+      "filename": "lab-390.png",
+      "mode": "api-live-GET-only",
+      "httpStatus": 200,
+      "heading": [
+        "Tes Lab"
+      ],
+      "mainExcerpt": "Tes Lab  Sampel road tanker dan batch tangki proses. Lab memasukkan hasil uji tiap parameter; RT baru masuk antrean bongkar setelah dirilis QA.  Perlu diperiksa  3sampel  Menunggu ",
+      "state": "rendered",
+      "pageWidth": 390,
+      "bytes": 186074
+    },
+    {
+      "route": "/penjadwalan",
+      "width": 390,
+      "filename": "penjadwalan-390.png",
+      "mode": "api-live-GET-only",
+      "httpStatus": 200,
+      "heading": [
+        "Penjadwalan"
+      ],
+      "mainExcerpt": "Penjadwalan  Susun batch per hari dan pantau alokasi rencana mingguan.  PO & versi jadwal Susun jadwal Filter tanggal 28 Nov 2026 Target mingguan 0 L Target usulan unik pada minggu",
+      "state": "rendered",
+      "pageWidth": 390,
+      "bytes": 232207
+    },
+    {
+      "route": "/qc-produk",
+      "width": 390,
+      "filename": "qc-produk-390.png",
+      "mode": "api-live-GET-only",
+      "httpStatus": 200,
+      "heading": [
+        "QC Barang Jadi"
+      ],
+      "mainExcerpt": "QC Barang Jadi  Hasil QC lot barang jadi dari LIMS sebelum lot dikirim dari gudang.  Lot diuji  2lot  Out-of-spec  1lot  Lulus  1lot  Sampel lot barang jadi  Pilih baris untuk meli",
+      "state": "rendered",
+      "pageWidth": 390,
+      "bytes": 101374
+    },
+    {
+      "route": "/produksi",
+      "width": 390,
+      "filename": "produksi-390.png",
+      "mode": "api-live-GET-only",
+      "httpStatus": 200,
+      "heading": [
+        "Produksi"
+      ],
+      "mainExcerpt": "Produksi  Periksa kecukupan volume susu per batch dan tinjau rekomendasi berdasarkan data produksi.  Prediksi pemenuhan Alur pabrik Tanggal produksi yang dinilai (WIB) 28 Nov 2026 ",
+      "state": "rendered",
+      "pageWidth": 390,
+      "bytes": 127912
+    },
+    {
+      "route": "/alat",
+      "width": 390,
+      "filename": "alat-390.png",
+      "mode": "api-live-GET-only",
+      "httpStatus": 200,
+      "heading": [
+        "Alat"
+      ],
+      "mainExcerpt": "Alat  Pantau katalog dan status alat, kelola pengaturan operasional, serta periksa konfigurasi lini.  Katalog alat Pengaturan Konfigurasi lini Alat operasional Termasuk pipa Katalo",
+      "state": "rendered",
+      "pageWidth": 390,
+      "bytes": 1495267
+    },
+    {
+      "route": "/produk",
+      "width": 390,
+      "filename": "produk-390.png",
+      "mode": "api-live-GET-only",
+      "httpStatus": 200,
+      "heading": [
+        "Master Produk"
+      ],
+      "mainExcerpt": "Master Produk  Daftar produk dan pilihan kemasannya. Pilih produk untuk melihat varian pasar dan kode SKU.  Katalog produk  SKU cair adalah kode produk sebelum dikemas. Gunakan pen",
+      "state": "rendered",
+      "pageWidth": 390,
+      "bytes": 191182
+    },
+    {
+      "route": "/aturan-produksi",
+      "width": 390,
+      "filename": "aturan-produksi-390.png",
+      "mode": "api-live-GET-only",
+      "httpStatus": 200,
+      "heading": [
+        "Aturan Produksi"
+      ],
+      "mainExcerpt": "Aturan Produksi  Aturan changeover, CIP, constraint, dan satuan aset dari master API. Aturan master hanya dapat dibaca.  Klasifikasi changeover  Periksa transisi dua finished SKU t",
+      "state": "rendered",
+      "pageWidth": 390,
+      "bytes": 691168
+    },
+    {
+      "route": "/rencana/alur",
+      "width": 390,
+      "filename": "rencana-alur-390.png",
+      "mode": "api-live-GET-only",
+      "httpStatus": 200,
+      "heading": [
+        "Alur rencana"
+      ],
+      "mainExcerpt": "Alur rencana  Usulan mingguan, batch terhubung, dan urutan alat dari data produksi.  Alur rencana Rekomendasi upgrade Kelayakan & keputusan Tanggal & batch produksi  Tanggal awal m",
+      "state": "rendered",
+      "pageWidth": 390,
+      "bytes": 246332
+    },
+    {
+      "route": "/rencana/upgrade",
+      "width": 390,
+      "filename": "rencana-upgrade-390.png",
+      "mode": "api-live-GET-only",
+      "httpStatus": 200,
+      "heading": [
+        "Rekomendasi upgrade"
+      ],
+      "mainExcerpt": "Rekomendasi upgrade  Rekomendasi berdasarkan prediksi produksi, tanpa simulasi kapasitas lokal.  Alur rencana Rekomendasi upgrade Kelayakan & keputusan Tanggal & batch produksi  Ta",
+      "state": "rendered",
+      "pageWidth": 390,
+      "bytes": 214600
+    },
+    {
+      "route": "/rencana",
+      "width": 390,
+      "filename": "rencana-390.png",
+      "mode": "api-live-GET-only",
+      "httpStatus": 200,
+      "heading": [
+        "Kelayakan & keputusan"
+      ],
+      "mainExcerpt": "Kelayakan & keputusan  Periksa prediksi dan fakta produksi sebelum mencatat keputusan rekomendasi.  Alur rencana Rekomendasi upgrade Kelayakan & keputusan Tanggal & batch produksi ",
+      "state": "rendered",
+      "pageWidth": 390,
+      "bytes": 179210
+    },
+    {
+      "route": "/riwayat-produksi",
+      "width": 390,
+      "filename": "riwayat-produksi-390.png",
+      "mode": "api-live-GET-only",
+      "httpStatus": 200,
+      "heading": [
+        "Riwayat Produksi"
+      ],
+      "mainExcerpt": "Riwayat Produksi  Pilih hasil produksi, lalu ikuti jalurnya dari asal susu sampai produk selesai.  Context Graph Pilih output produksi  Tentukan hasil produksi untuk melihat seluru",
+      "state": "rendered",
+      "pageWidth": 390,
+      "bytes": 286896
+    },
+    {
+      "route": "/graph",
+      "width": 390,
+      "filename": "graph-390.png",
+      "mode": "api-live-GET-only",
+      "httpStatus": 200,
+      "heading": [
+        "Context Graph"
+      ],
+      "mainExcerpt": "Context Graph  Farm, RT, hasil lab, aset proses, dan lot barang jadi yang saling terhubung. Seret node untuk menggeser, klik untuk melihat hubungannya. Ukuran node mengikuti jumlah",
+      "state": "rendered",
+      "pageWidth": 390,
+      "bytes": 184641
+    }
+  ],
+  "pageErrors": [],
+  "blockedWrites": [
+    "POST /api/v1/plans/current/check",
+    "POST /api/v1/plans/current/check",
+    "POST /api/v1/plans/current/check"
+  ]
+}

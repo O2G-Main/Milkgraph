@@ -50,14 +50,34 @@ typography:
     lineHeight: 1.5
   label:
     fontFamily: Onest
-    fontSize: 12px
+    fontSize: 13px
     fontWeight: 500
     lineHeight: 1.4
   mono:
     fontFamily: JetBrains Mono
-    fontSize: 12px
+    fontSize: 13px
     fontWeight: 500
     lineHeight: 1.4
+  table:
+    fontFamily: Onest
+    fontSize: 16px
+    fontWeight: 400
+    lineHeight: 1.5
+  table-code:
+    fontFamily: JetBrains Mono
+    fontSize: 15px
+    fontWeight: 500
+    lineHeight: 1.5
+  action:
+    fontFamily: Onest
+    fontSize: 15px
+    fontWeight: 550
+    lineHeight: 1.5
+  badge:
+    fontFamily: Onest
+    fontSize: 12px
+    fontWeight: 500
+    lineHeight: 1.5
 rounded:
   sm: 10px
   md: 16px
@@ -107,15 +127,16 @@ components:
     backgroundColor: "{colors.primary}"
     textColor: "{colors.on-primary}"
     rounded: "{rounded.full}"
-    height: 44px
-    padding: 0 20px
+    height: 46px
+    padding: 0 22px
   button-primary-hover:
     backgroundColor: "{colors.primary-hover}"
   button-secondary:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.on-surface}"
     rounded: "{rounded.full}"
-    height: 44px
+    height: 46px
+    padding: 0 22px
   badge-ok:
     backgroundColor: "{colors.status-ok-soft}"
     textColor: "{colors.status-ok}"
@@ -152,7 +173,10 @@ Karakter: rapi dan bersahabat, bukan layar kontrol industri yang gelap dan bisin
 
 - **Onest** (self-host via `next/font`, `display: swap`) untuk semua teks; angka metrik memakai `tnum` agar kolom rata.
 - **JetBrains Mono** untuk ID: RT (RT-26), lot (FG-1013-07), tangki (RMT-2), sumber (LAB-8812), dan query template.
-- Hierarki: `display` judul halaman (satu per layar), `title` judul kartu, `metric` angka utama, `body` isi, `label` subjudul abu dan header tabel.
+- Hierarki mengikuti Master Produk: `display` judul halaman (satu per layar), `title` judul kartu, `metric` angka utama, `body` isi/subjudul 14px, `label` label formulir 13px, `table` isi dan header tabel 16px (header berbobot 600), ID tabel 15px, badge 12px.
+- Tombol detail mengikuti “Lihat detail” Master Produk: Onest 15px/550, tinggi minimum 46px, pill putih dengan tepi netral; hover/fokus memakai hijau merek. Padding horizontal 22px, atau 18px pada mobile. Tombol utama dan aksi berbahaya tetap mempertahankan hierarkinya.
+- Label sumbu grafik, node graph/3D, dan jam Gantt tetap boleh kompak; jangan mengecilkan teks HTML penjelasan, tabel, atau aksi hanya agar muat. Formulir teks mobile minimal 16px untuk mencegah zoom otomatis.
+- Tabel lebar bergulir di `.table-wrap` yang memiliki `position: relative`, sehingga label aksesibel `.sr-only` tidak memperlebar halaman. Aksi detail berlabel mendapat baris sendiri pada kartu tabel mobile; tidak memakai slot ikon absolut 44px.
 - Subjudul kartu satu baris abu (`on-surface-muted`) di bawah judul, seperti "Track your performance" di referensi. Tidak ada eyebrow label di atas judul.
 
 ## Layout
@@ -190,7 +214,7 @@ Sangat membulat: kartu `lg` 24px, panel `lg`, tombol dan badge `full`, input `fu
 - **Kartu metrik:** ikon dalam lingkaran kecil + label, delta dengan panah (↗ hijau / ↘ abu), angka `metric`, sparkline area hijau pudar. Contoh: "Throughput receiving", "Tunggu lab test".
 - **State machine RT (Receiving):** 7 kartu tahap (Farms, On the way, Sampling, Lab test, Released, Unloading, Stored) dengan jumlah RT dan status; lab test sebagai gerbang antrean memakai warna kritis. 7 kolom di ≥1400px, 4 di tablet, 2 di mobile.
 - **Kartu sorotan rencana (hijau gelap):** status kelayakan, sisa holding time RT kritis, 3 faktor bersumber, tombol "Periksa kelayakan rencana".
-- **Tabel:** header `label` abu, baris tanpa garis vertikal, badge status pill bertitik (seperti "Completed/Pending" di referensi).
+- **Tabel:** header 16px/600 abu dan isi 16px/400, baris tanpa garis vertikal, badge status 12px berbentuk pill bertitik.
 - **Jawaban asisten (Traceability):** status "Jalur graph terverifikasi", chip query template `mono` (mis. `trace_backward(lot_id = FG-1013-07)`), kesimpulan, bar proporsi volume (kandidat sumber merah, sisanya netral) atau tabel lot terdampak, lalu jalur bukti bernomor dengan chip sumber yang menyorot node. Tanpa template yang cocok: state abstain.
 - **Graph:** node pill putih bergaris `border`; rantai bukti = node hijau `accent-soft` + garis `accent-fill` tebal; lainnya diredupkan 40%.
 - **Gantt (`Timeline`, dipakai Rencana, Bay & Tangki, Filling):** baris dari `PlanView.resources` (Lab test, Bay 1-3, Filling F1/F2/F4); blok membulat `sm`; lab test bergaris putus, bongkar RT abu, CIP arsir hijau keabuan, filling hijau pudar, changeover hijau keabuan, starvation merah pudar, pelanggaran constraint arsir merah bergaris tepi; toggle rencana awal / rekomendasi.

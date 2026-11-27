@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>MilkGraph — Aset Visual</title>
+<style>
+  @page { size: 13.333in 7.5in; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    font-family: Onest, system-ui, sans-serif;
+    background: #F4F4F3;
+    color: #141414;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page {
+    position: relative;
+    width: 1280px; height: 720px;
+    padding: 56px 64px;
+    overflow: hidden;
+    page-break-after: always;
+    background: #F4F4F3;
+    display: flex; flex-direction: column;
+  }
+  .page:last-child { page-break-after: auto; }
+  .page::before {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(900px 520px at 88% -10%, rgba(0,120,42,0.10), transparent 70%);
+    pointer-events: none;
+  }
+  .page > * { position: relative; }
+
+  .eyebrow {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+    color: #6B6B68;
+  }
+  h1 { font-size: 40px; font-weight: 600; line-height: 1.1; letter-spacing: -0.025em; }
+  h2 { font-size: 26px; font-weight: 600; letter-spacing: -0.02em; }
+  .sub { font-size: 14px; color: #6B6B68; line-height: 1.55; }
+  .mono { font-family: "JetBrains Mono", monospace; font-size: 11.5px; font-weight: 500; }
+
+  .head { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 26px; }
+  .foot {
+    margin-top: auto; padding-top: 14px; border-top: 1px solid #E2E2DF;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 10.5px; color: #6B6B68; letter-spacing: 0.02em;
+  }
+
+  .card {
+    background: #fff; border-radius: 24px; padding: 24px;
+    box-shadow: 0 14px 36px -18px rgba(15,42,29,0.26);
+  }
+  .dark { background: #0F2A1D; color: #fff; border-radius: 24px; }
+  .dark .sub { color: #A9D6B4; }
+
+  /* cover */
+  .cover { justify-content: space-between; }
+  .cover .brandmark { display: flex; align-items: center; gap: 18px; }
+  .cover h1 { font-size: 54px; margin-top: 8px; }
+  .cover .lead { font-size: 16px; color: #3C3C3A; max-width: 620px; line-height: 1.6; margin-top: 16px; }
+  .row { display: flex; gap: 16px; }
+
+  /* logo grid */
+  .logogrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; flex: 1; }
+  .swatchbox {
+    border-radius: 20px; display: flex; align-items: center; justify-content: center;
+    border: 1px solid #E2E2DF; min-height: 0;
+  }
+  .swatchbox.light { background: #fff; }
+  .swatchbox.canvas { background: #ECECEA; }
+  .swatchbox.dark { background: #0F2A1D; border-color: #0F2A1D; }
+  .swatchbox.green { background: #00782A; border-color: #00782A; }
+  .logocell { display: flex; flex-direction: column; gap: 10px; }
+  .logocell .cap { display: flex; justify-content: space-between; align-items: baseline; }
+  .logocell .cap b { font-size: 12px; font-weight: 600; }
+  .logocell .cap span { font-size: 10.5px; color: #6B6B68; }
+
+  /* colors */
+  .cgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; flex: 1; align-content: start; }
+  .chip { border-radius: 16px; overflow: hidden; background: #fff; box-shadow: 0 8px 24px -16px rgba(15,42,29,0.3); }
+  .chip .fill { height: 62px; }
+  .chip .meta { padding: 10px 12px 12px; }
+  .chip .meta b { display: block; font-size: 11.5px; font-weight: 600; }
+  .chip .meta span { display: block; font-size: 10px; color: #6B6B68; margin-top: 2px; }
+
+  /* type */
+  .spec { display: flex; align-items: baseline; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #E2E2DF; }
+  .spec:last-child { border-bottom: 0; }
+  .spec .k { font-size: 11px; color: #6B6B68; width: 96px; }
+
+  /* screenshot pages */
+  .shot-frame {
+    flex: 1; border-radius: 20px; overflow: hidden; border: 1px solid #E2E2DF;
+    box-shadow: 0 24px 56px -30px rgba(15,42,29,0.45); background: #fff;
+  }
+  .shot-frame img { width: 100%; height: 100%; object-fit: cover; object-position: top left; display: block; }
+  .shot-frame.fit img { object-fit: contain; background: #fff; }
+  .caption { margin-top: 16px; display: flex; gap: 28px; }
+  .caption div { flex: 1; }
+  .caption b { display: block; font-size: 12px; font-weight: 600; margin-bottom: 3px; }
+  .caption span { font-size: 11px; color: #6B6B68; line-height: 1.5; }
+
+  .phones { display: flex; gap: 22px; flex: 1; align-items: center; justify-content: center; }
+  .phone { height: 100%; max-height: 476px; border-radius: 22px; overflow: hidden;
+           border: 1px solid #E2E2DF; box-shadow: 0 18px 40px -24px rgba(15,42,29,0.5); background: #fff; }
+  .phone img { height: 100%; width: auto; display: block; }
+
+  .filelist { display: flex; flex-direction: column; gap: 0; }
+  .frow { display: flex; justify-content: space-between; gap: 20px; padding: 9px 0; border-bottom: 1px solid #E2E2DF; font-size: 11.5px; }
+  .frow .p { font-family: "JetBrains Mono", monospace; font-size: 10.5px; color: #6B6B68; }
+  .rule { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid #E2E2DF; font-size: 12px; line-height: 1.5; }
+  .rule b { flex: 0 0 auto; color: #00782A; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<!-- 1. COVER -->
+<section class="page cover">
+  <div>
+    <div class="brandmark">
+      <svg width="64" height="64" viewBox="0 0 256 256" aria-label="MilkGraph">
+        <path fill="#0F2A1D" d="M44 116A56 56 0 0 1 156 116V196H116V116A16 16 0 0 0 84 116H44ZM116 196V116A56 56 0 0 1 228 116V196H188V116A16 16 0 0 0 156 116V196Z"/>
+        <circle fill="#008A30" cx="64" cy="176" r="20"/>
+      </svg>
+      <div>
+        <div style="font-size:22px;font-weight:700;letter-spacing:-0.02em;">MilkGraph</div>
+        <div class="eyebrow" style="margin-top:3px;">Dairy operations</div>
+      </div>
+    </div>
+    <h1 style="margin-top:40px;">Aset visual<br>dan materi presentasi</h1>
+    <p class="lead">Logo, palet warna, tipografi, dan tangkapan layar antarmuka MilkGraph siap dipakai untuk deck presentasi. Seluruh tangkapan layar memakai data simulasi.</p>
+    <div class="row" style="gap:0;margin-top:44px;border-top:1px solid #E2E2DF;padding-top:18px;max-width:760px;">
+      <div style="flex:1;">
+        <div class="eyebrow">Layar inti</div>
+        <div style="font-size:13px;margin-top:5px;">Receiving Flow</div>
+      </div>
+      <div style="flex:1;">
+        <div class="eyebrow">Perencanaan</div>
+        <div style="font-size:13px;margin-top:5px;">Rencana dan kelayakan</div>
+      </div>
+      <div style="flex:1;">
+        <div class="eyebrow">Penelusuran</div>
+        <div style="font-size:13px;margin-top:5px;">Traceability</div>
+      </div>
+      <div style="flex:1;">
+        <div class="eyebrow">Tata letak</div>
+        <div style="font-size:13px;margin-top:5px;">Simulasi 3D</div>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div class="row" style="gap:14px;margin-bottom:22px;">
+      <div class="card" style="flex:1;padding:18px 20px;">
+        <div class="eyebrow">Isi paket</div>
+        <div style="font-size:13px;margin-top:6px;line-height:1.6;">Logo 3 varian &middot; 20 token warna<br>2 rupa huruf &middot; 12 tangkapan layar</div>
+      </div>
+      <div class="dark" style="flex:1;padding:18px 20px;">
+        <div class="eyebrow" style="color:#A9D6B4;">Format</div>
+        <div style="font-size:13px;margin-top:6px;line-height:1.6;">PDF 16:9 untuk impor ke PowerPoint.<br>PNG dan SVG asli di docs/asset-pack/.</div>
+      </div>
+    </div>
+    <div class="foot" style="border-top-color:#D8D8D4;">
+      <span>MilkGraph &middot; mockup operasional pabrik susu</span>
+      <span>26 November 2026</span>
+    </div>
+  </div>
+</section>
+
+<!-- 2. LOGO -->
+<section class="page">
+  <div class="head">
+    <div>
+      <div class="eyebrow">01 &middot; Identitas</div>
+      <h2 style="margin-top:6px;">Logo dan variannya</h2>
+    </div>
+    <div class="sub" style="max-width:300px;text-align:right;">Huruf <b>m</b> dari dua lengkung; kaki kirinya lepas menjadi node. Satu bentuk, satu ide.</div>
+  </div>
+
+  <div class="logogrid">
+    <div class="logocell">
+      <div class="swatchbox light" style="flex:1;">
+        <img src="../../docs/brand/final/milkgraph-horizontal-color.svg" style="width:74%;">
+      </div>
+      <div class="cap"><b>Horizontal, penuh warna</b><span>utama, latar terang</span></div>
+    </div>
+    <div class="logocell">
+      <div class="swatchbox dark" style="flex:1;">
+        <img src="../../docs/brand/final/milkgraph-horizontal-white.svg" style="width:74%;">
+      </div>
+      <div class="cap"><b>Horizontal, putih</b><span>latar hijau tua</span></div>
+    </div>
+    <div class="logocell">
+      <div class="swatchbox canvas" style="flex:1;">
+        <img src="../../docs/brand/final/milkgraph-stacked-color.svg" style="width:38%;">
+      </div>
+      <div class="cap"><b>Tersusun</b><span>ruang sempit</span></div>
+    </div>
+    <div class="logocell">
+      <div class="swatchbox light" style="flex:1;">
+        <img src="../../docs/brand/final/milkgraph-symbol-color.svg" style="width:78px;">
+      </div>
+      <div class="cap"><b>Simbol</b><span>avatar, ikon</span></div>
+    </div>
+    <div class="logocell">
+      <div class="swatchbox green" style="flex:1;">
+        <img src="../../docs/brand/final/milkgraph-symbol-white.svg" style="width:78px;">
+      </div>
+      <div class="cap"><b>Simbol putih</b><span>di hijau merek</span></div>
+    </div>
+    <div class="logocell">
+      <div class="swatchbox light" style="flex:1;">
+        <img src="../../docs/brand/final/png/milkgraph-app-tile.png" style="width:112px;border-radius:26px;">
+      </div>
+      <div class="cap"><b>Ikon aplikasi</b><span>1200 px, PNG &amp; SVG</span></div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span>Ruang kosong minimal 1 diameter node &middot; simbol min. 16 px &middot; lockup min. 96 px</span>
+    <span>Jangan regangkan, miringkan, atau ganti warna node</span>
+  </div>
+</section>
+
+<!-- 3. WARNA -->
+<section class="page">
+  <div class="head">
+    <div>
+      <div class="eyebrow">02 &middot; Warna</div>
+      <h2 style="margin-top:6px;">Palet merek dan token antarmuka</h2>
+    </div>
+    <div class="sub" style="max-width:320px;text-align:right;">Hijau adalah satu-satunya warna merek. Status memakai teal, kuning tua, dan merah agar tidak tertukar.</div>
+  </div>
+
+  <div class="cgrid">
+    <div class="chip"><div class="fill" style="background:#00782A"></div><div class="meta"><b>Hijau merek</b><span class="mono">#00782A</span><span class="mono" style="font-size:9px;color:#9A9A96;margin-top:1px;">--color-primary</span><span>tombol utama, teks aksen</span></div></div>
+    <div class="chip"><div class="fill" style="background:#005130"></div><div class="meta"><b>Hijau tua</b><span class="mono">#005130</span><span class="mono" style="font-size:9px;color:#9A9A96;margin-top:1px;">--color-primary-hover</span><span>hover, aksen logo</span></div></div>
+    <div class="chip"><div class="fill" style="background:#008A30"></div><div class="meta"><b>Node / isi grafik</b><span class="mono">#008A30</span><span class="mono" style="font-size:9px;color:#9A9A96;margin-top:1px;">--color-accent-fill</span><span>grafik dan ikon besar</span></div></div>
+    <div class="chip"><div class="fill" style="background:#92D1A0"></div><div class="meta"><b>Hijau muda</b><span class="mono">#92D1A0</span><span class="mono" style="font-size:9px;color:#9A9A96;margin-top:1px;">--color-on-inverse-muted</span><span>teks di latar gelap</span></div></div>
+
+    <div class="chip"><div class="fill" style="background:#0F2A1D"></div><div class="meta"><b>Hijau tinta</b><span class="mono">#0F2A1D</span><span class="mono" style="font-size:9px;color:#9A9A96;margin-top:1px;">--color-surface-inverse</span><span>permukaan sorotan</span></div></div>
+    <div class="chip"><div class="fill" style="background:#E3F2E7;border-bottom:1px solid #E2E2DF"></div><div class="meta"><b>Hijau lembut</b><span class="mono">#E3F2E7</span><span class="mono" style="font-size:9px;color:#9A9A96;margin-top:1px;">--color-accent-soft</span><span>latar badge, node graph</span></div></div>
+    <div class="chip"><div class="fill" style="background:#D8E4DB"></div><div class="meta"><b>Netral hijau</b><span class="mono">#D8E4DB</span><span class="mono" style="font-size:9px;color:#9A9A96;margin-top:1px;">--color-neutral-fill</span><span>pembanding periode lalu</span></div></div>
+    <div class="chip"><div class="fill" style="background:#F4F4F3;border-bottom:1px solid #E2E2DF"></div><div class="meta"><b>Kanvas</b><span class="mono">#F4F4F3</span><span class="mono" style="font-size:9px;color:#9A9A96;margin-top:1px;">--color-canvas</span><span>latar halaman</span></div></div>
+
+    <div class="chip"><div class="fill" style="background:#0F766E"></div><div class="meta"><b>Status normal</b><span class="mono">#0F766E</span><span class="mono" style="font-size:9px;color:#9A9A96;margin-top:1px;">--color-status-ok</span><span>teal, bukan hijau merek</span></div></div>
+    <div class="chip"><div class="fill" style="background:#94580A"></div><div class="meta"><b>Status waspada</b><span class="mono">#94580A</span><span class="mono" style="font-size:9px;color:#9A9A96;margin-top:1px;">--color-status-warn</span><span>kuning tua</span></div></div>
+    <div class="chip"><div class="fill" style="background:#B91C1C"></div><div class="meta"><b>Status kritis</b><span class="mono">#B91C1C</span><span class="mono" style="font-size:9px;color:#9A9A96;margin-top:1px;">--color-status-crit</span><span>merah, selalu dengan teks</span></div></div>
+    <div class="chip"><div class="fill" style="background:#141414"></div><div class="meta"><b>Teks utama</b><span class="mono">#141414</span><span class="mono" style="font-size:9px;color:#9A9A96;margin-top:1px;">--color-on-surface</span><span>di atas putih</span></div></div>
+  </div>
+
+  <div class="foot">
+    <span>Kontras teks minimal 4,5:1 &middot; elemen antarmuka minimal 3:1</span>
+    <span>Satu kartu hijau gelap per layar</span>
+  </div>
+</section>
+
+<!-- 4. TIPOGRAFI -->
+<section class="page">
+  <div class="head">
+    <div>
+      <div class="eyebrow">03 &middot; Tipografi</div>
+      <h2 style="margin-top:6px;">Onest dan JetBrains Mono</h2>
+    </div>
+    <div class="sub" style="max-width:320px;text-align:right;">Satu keluarga sans untuk semua teks; mono hanya untuk ID dan perintah.</div>
+  </div>
+
+  <div class="row" style="flex:1;gap:16px;">
+    <div class="card" style="flex:1.35;display:flex;flex-direction:column;">
+      <div class="eyebrow">Onest &middot; SIL OFL 1.1</div>
+      <div style="font-size:64px;font-weight:600;letter-spacing:-0.03em;line-height:1.2;margin-top:14px;">Aa Bb Cc</div>
+      <div style="font-size:26px;font-weight:600;letter-spacing:-0.02em;margin-top:2px;">Rencana tidak layak</div>
+      <div style="font-size:13px;color:#3C3C3A;line-height:1.6;margin-top:10px;max-width:430px;">
+        Dipakai untuk judul, isi, dan angka metrik. Angka memakai <span style="font-variant-numeric:tabular-nums;">tnum</span> agar kolom rata: 8.400 L &middot; 0,25% &middot; 14.42.
+      </div>
+      <div style="margin-top:auto;">
+        <div class="spec"><span class="k">Display</span><span style="font-size:19px;font-weight:600;letter-spacing:-0.02em;">32 / 600</span></div>
+        <div class="spec"><span class="k">Judul kartu</span><span style="font-size:15px;font-weight:600;">18 / 600</span></div>
+        <div class="spec"><span class="k">Angka metrik</span><span style="font-size:17px;font-weight:600;">28 / 600</span></div>
+        <div class="spec"><span class="k">Isi</span><span style="font-size:13px;">14 / 400</span></div>
+      </div>
+    </div>
+
+    <div style="flex:1;display:flex;flex-direction:column;gap:16px;">
+      <div class="dark" style="padding:22px 24px;flex:1;display:flex;flex-direction:column;">
+        <div class="eyebrow" style="color:#A9D6B4;">JetBrains Mono &middot; SIL OFL 1.1</div>
+        <div class="mono" style="font-size:17px;margin-top:12px;line-height:1.9;">RT-26 &nbsp; FG-1013-07<br>RMT-2 &nbsp; LAB-8812</div>
+        <div class="mono" style="font-size:11px;color:#A9D6B4;margin-top:10px;">trace_backward(lot_id = FG-1013-07)</div>
+        <div class="sub" style="font-size:11.5px;margin-top:12px;">ID dan perintah selalu mono, 12 px, medium.</div>
+        <div style="margin-top:auto;">
+          <div class="spec" style="border-top:1px solid rgba(255,255,255,0.14);border-bottom-color:rgba(255,255,255,0.14);"><span class="k" style="color:#A9D6B4;">ID batch</span><span class="mono" style="font-size:12px;">FG-1013-07</span></div>
+          <div class="spec" style="border-bottom-color:rgba(255,255,255,0.14);"><span class="k" style="color:#A9D6B4;">ID tangki</span><span class="mono" style="font-size:12px;">RMT-2</span></div>
+          <div class="spec" style="border-bottom:0;"><span class="k" style="color:#A9D6B4;">Sumber lab</span><span class="mono" style="font-size:12px;">LAB-8812</span></div>
+        </div>
+      </div>
+      <div class="card" style="flex:1;">
+        <div class="eyebrow">Aturan tulis</div>
+        <div class="rule"><b>&mdash;</b><span>Tanpa em dash. Rentang memakai tanda hubung: 14.00-16.20.</span></div>
+        <div class="rule"><b>.</b><span>Waktu 24 jam: 14.30, bukan 2:30 PM.</span></div>
+        <div class="rule" style="border-bottom:0;"><b>,</b><span>Angka format Indonesia: 8.400 L, 0,25%.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span>Bahasa Indonesia, tenang, tanpa emoji</span>
+    <span>Ikon hanya lucide, stroke 1.75</span>
+  </div>
+</section>
+
+<!-- 5. PRODUK -->
+<section class="page">
+  <div class="head">
+    <div>
+      <div class="eyebrow">04 &middot; Produk</div>
+      <h2 style="margin-top:6px;">Apa yang dibangun MilkGraph</h2>
+    </div>
+    <div class="sub" style="max-width:340px;text-align:right;">Dua problem statement mitra: alur receiving yang dinamis dan traceability volume end-to-end.</div>
+  </div>
+
+  <div class="row" style="flex:1;gap:16px;">
+    <div style="flex:1.6;display:flex;flex-direction:column;gap:16px;">
+      <div class="card" style="flex:0;">
+        <div class="eyebrow">Masalah 01</div>
+        <div style="font-size:17px;font-weight:600;margin-top:6px;letter-spacing:-0.01em;">Receiving flow dinamis</div>
+        <div class="sub" style="margin-top:6px;">Antrean RT di gerbang, ketersediaan bay, jadwal CIP, dan kelayakan rencana terhadap 6 constraint. Simulasi 3D memakai tata letak plant sungguhan hasil penelusuran citra satelit.</div>
+      </div>
+      <div class="card" style="flex:0;">
+        <div class="eyebrow">Masalah 02</div>
+        <div style="font-size:17px;font-weight:600;margin-top:6px;letter-spacing:-0.01em;">Traceability volume</div>
+        <div class="sub" style="margin-top:6px;">Rantai serah-terima batch, genealogi lot, penelusuran mundur dan maju, context graph, serta hold dan recall. Setiap klaim disertai jalur bukti bernomor.</div>
+      </div>
+      <div class="dark" style="padding:20px 24px;">
+        <div class="eyebrow" style="color:#A9D6B4;">Prinsip</div>
+        <div style="font-size:14px;margin-top:6px;line-height:1.6;">Jawaban disertai bukti. Faktor terkait perlu dikonfirmasi. Manusia menyetujui rekomendasi. Data simulasi selalu dilabeli.</div>
+      </div>
+    </div>
+
+    <div style="flex:1;display:flex;flex-direction:column;gap:16px;">
+      <div class="card" style="flex:1;">
+        <div class="eyebrow">Pengguna</div>
+        <div style="font-size:13px;line-height:1.85;margin-top:8px;">
+          Planner PPIC<br>
+          Koordinator receiving<br>
+          Supervisor produksi<br>
+          QA dan Laboratorium
+        </div>
+      </div>
+      <div class="card" style="flex:1;">
+        <div class="eyebrow">Cakupan</div>
+        <div style="font-size:13px;line-height:1.85;margin-top:8px;">
+          14 halaman berfungsi<br>
+          State demo bersama per peran<br>
+          Audit dan reset demo<br>
+          Kontrak backend sudah ditulis
+        </div>
+      </div>
+      <div class="card" style="flex:0.8;">
+        <div class="eyebrow">Teknologi</div>
+        <div class="mono" style="font-size:10.5px;line-height:1.9;margin-top:6px;color:#3C3C3A;">
+          Next.js 16 &middot; TypeScript &middot; Tailwind v4<br>
+          Three.js &middot; Recharts &middot; xyflow<br>
+          Rencana: FastAPI, Neo4j, OR-Tools
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>Mockup interaktif, belum terhubung backend</span><span>Seluruh angka adalah data simulasi</span></div>
+</section>
+
+<!-- 6. RECEIVING -->
+<section class="page">
+  <div class="head">
+    <div><div class="eyebrow">05 &middot; Antarmuka</div><h2 style="margin-top:6px;">Receiving Flow</h2></div>
+    <div class="sub" style="max-width:300px;text-align:right;">Satu layar untuk melihat antrean RT, status bay, dan kelayakan rencana shift.</div>
+  </div>
+  <div class="shot-frame"><img src="screens/01-receiving.png"></div>
+  <div class="caption">
+    <div><b>Metrik atas</b><span>Throughput, waktu putar, tunggu lab, bay aktif.</span></div>
+    <div><b>Alur penerimaan RT</b><span>Tujuh tahap dari farm sampai tangki; lab test sebagai gerbang antrean.</span></div>
+    <div><b>Kartu sorotan</b><span>Satu kartu hijau gelap: 3 constraint dilanggar dan sisa holding time.</span></div>
+  </div>
+</section>
+
+<!-- 7. RENCANA -->
+<section class="page">
+  <div class="head">
+    <div><div class="eyebrow">06 &middot; Antarmuka</div><h2 style="margin-top:6px;">Rencana dan kelayakan</h2></div>
+    <div class="sub" style="max-width:320px;text-align:right;">Gantt rencana awal dibanding rekomendasi solver, dengan enam constraint yang diperiksa.</div>
+  </div>
+  <div class="shot-frame"><img src="screens/02-rencana.png"></div>
+  <div class="caption">
+    <div><b>Rekomendasi solver</b><span>Constraint dilanggar 3 ke 0, waktu putar RT turun ke 2j 41m.</span></div>
+    <div><b>Dampak terhitung</b><span>Waktu putar, starvation filling, dan RT antre di plant sampai 16.00.</span></div>
+    <div><b>Pemeriksaan kelayakan</b><span>Enam constraint dibanding rencana awal, alasan tiap pelanggaran.</span></div>
+  </div>
+</section>
+
+<!-- 8. TRACE -->
+<section class="page">
+  <div class="head">
+    <div><div class="eyebrow">07 &middot; Antarmuka</div><h2 style="margin-top:6px;">Traceability</h2></div>
+    <div class="sub" style="max-width:320px;text-align:right;">Pertanyaan bahasa alami dijawab dengan jalur bukti, bukan sekadar angka.</div>
+  </div>
+  <div class="shot-frame"><img src="screens/03-trace.png"></div>
+  <div class="caption">
+    <div><b>Banner out-of-spec</b><span>CC FG di atas batas antibiotik; tombol trace mundur dan maju.</span></div>
+    <div><b>Tanya graph</b><span>Query template terverifikasi yang bisa diklik, bukan query bebas.</span></div>
+    <div><b>Graph view</b><span>Jalur genealogi 14 node dan 13 relasi, dari Farm Randehijo ke UHT.</span></div>
+  </div>
+</section>
+
+<!-- 9. SIMULASI 3D -->
+<section class="page">
+  <div class="head">
+    <div><div class="eyebrow">08 &middot; Antarmuka</div><h2 style="margin-top:6px;">Simulasi 3D tata letak plant</h2></div>
+    <div class="sub" style="max-width:320px;text-align:right;">Kamera ortografis, gedung matte, aliran susu hijau, pin berdenyut untuk bottleneck.</div>
+  </div>
+  <div class="shot-frame"><img src="screens/05-simulasi-3d-penuh.png"></div>
+  <div class="caption">
+    <div><b>Data nyata</b><span>Tata letak ditelusuri dari citra satelit publik, bukan denah karangan.</span></div>
+    <div><b>Scene 3D</b><span>Kamera ortografis, gedung matte, aliran susu hijau, pin status per tangki.</span></div>
+    <div><b>Bottleneck</b><span>Lab test, RT-26 di yard, bay 2; klik untuk memfokuskan kamera.</span></div>
+  </div>
+</section>
+
+<!-- 10. 3D DETAIL -->
+<section class="page">
+  <div class="head">
+    <div><div class="eyebrow">09 &middot; Perbandingan</div><h2 style="margin-top:6px;">Rencana awal dan rekomendasi</h2></div>
+    <div class="sub" style="max-width:300px;text-align:right;">Tampilan isometrik yang sama, dua keadaan berbeda.</div>
+  </div>
+  <div class="row" style="flex:1;gap:16px;">
+    <div style="flex:1;display:flex;flex-direction:column;gap:10px;">
+      <div class="eyebrow">Rencana awal</div>
+      <div class="shot-frame fit" style="margin:0;"><img src="../../mockup/kepake/04a-3d-rencana-awal-isometrik.png"></div>
+      <div class="sub" style="font-size:11px;">Antrean menumpuk di gerbang, bay tidak seimbang.</div>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;gap:10px;">
+      <div class="eyebrow">Rekomendasi solver</div>
+      <div class="shot-frame fit" style="margin:0;"><img src="../../mockup/kepake/05a-3d-rekomendasi-isometrik.png"></div>
+      <div class="sub" style="font-size:11px;">Beban dibagi ulang, sisa holding time kritis berkurang.</div>
+    </div>
+  </div>
+  <div class="foot">
+    <span>Kamera isometrik yang sama untuk kedua keadaan</span>
+    <span>Kedua gambar dari state demo yang sama</span>
+  </div>
+</section>
+
+<!-- 11. MOBILE -->
+<section class="page">
+  <div class="head">
+    <div><div class="eyebrow">10 &middot; Responsif</div><h2 style="margin-top:6px;">Versi ponsel</h2></div>
+    <div class="sub" style="max-width:320px;text-align:right;">375 px: sidebar menjadi drawer, tabel menjadi daftar kartu, tanpa scroll horizontal.</div>
+  </div>
+  <div class="phones" style="gap:18px;">
+    <div class="phone"><img src="../../mockup/mobile/03-beranda.png"></div>
+    <div class="phone"><img src="../../mockup/mobile/04-penerimaan-antrean-truk.png"></div>
+    <div class="phone"><img src="../../mockup/mobile/07-simulasi-3d.png"></div>
+    <div class="phone"><img src="../../mockup/mobile/13-traceability-rantai-bukti.png"></div>
+  </div>
+  <div class="foot"><span>Beranda &middot; Antrean truk &middot; Simulasi 3D &middot; Rantai bukti</span><span>18 layar tersedia di mockup/mobile/</span></div>
+</section>
+
+<!-- 12. DAFTAR FILE -->
+<section class="page">
+  <div class="head">
+    <div><div class="eyebrow">11 &middot; Berkas</div><h2 style="margin-top:6px;">Di mana aset aslinya</h2></div>
+    <div class="sub" style="max-width:300px;text-align:right;">Pakai berkas asli saat menempel ke PowerPoint, bukan tangkapan dari PDF ini.</div>
+  </div>
+
+  <div class="row" style="flex:1;gap:16px;">
+    <div class="card" style="flex:1.4;">
+      <div class="eyebrow" style="margin-bottom:8px;">Logo</div>
+      <div class="filelist">
+        <div class="frow"><span>Lockup horizontal</span><span class="p">brand/final/milkgraph-horizontal-*.svg</span></div>
+        <div class="frow"><span>Lockup tersusun</span><span class="p">brand/final/milkgraph-stacked-*.svg</span></div>
+        <div class="frow"><span>Simbol</span><span class="p">brand/final/milkgraph-symbol-*.svg</span></div>
+        <div class="frow"><span>PNG 1200 px</span><span class="p">brand/final/png/*.png</span></div>
+        <div class="frow" style="border-bottom:0;"><span>Ikon aplikasi dan favicon</span><span class="p">brand/final/web/</span></div>
+      </div>
+      <div class="eyebrow" style="margin:18px 0 8px;">Tangkapan layar</div>
+      <div class="filelist">
+        <div class="frow"><span>Desktop 1440, crop 16:9</span><span class="p">asset-pack/screens/*.png</span></div>
+        <div class="frow"><span>Desktop penuh</span><span class="p">mockup/ dan mockup/kepake/</span></div>
+        <div class="frow"><span>Ponsel 375</span><span class="p">mockup/mobile/*.png</span></div>
+        <div class="frow" style="border-bottom:0;"><span>Alur driver RT</span><span class="p">mockup/tracking-rt/*.png</span></div>
+      </div>
+      <div class="eyebrow" style="margin:18px 0 8px;">Paket ini</div>
+      <div class="filelist">
+        <div class="frow"><span>PDF 12 halaman ini</span><span class="p">asset-pack/MilkGraph-Aset-Visual.pdf</span></div>
+        <div class="frow" style="border-bottom:0;"><span>Sumber deck</span><span class="p">asset-pack/deck.html</span></div>
+      </div>
+    </div>
+
+    <div style="flex:1;display:flex;flex-direction:column;gap:16px;">
+      <div class="dark" style="padding:22px 24px;">
+        <div class="eyebrow" style="color:#A9D6B4;">Catatan pemakaian</div>
+        <div style="font-size:12.5px;line-height:1.75;margin-top:8px;">
+          Seluruh tangkapan layar memakai data simulasi dan sudah diberi chip &ldquo;Data simulasi&rdquo;.<br><br>
+          Nama mitra tidak pernah tampil di antarmuka.<br><br>
+          Palet hijau terinspirasi industri susu; logo dan aset merek pihak lain tidak dipakai.
+        </div>
+      </div>
+      <div class="card" style="flex:1;">
+        <div class="eyebrow">Dokumen rujukan</div>
+        <div class="filelist" style="margin-top:6px;">
+          <div class="frow"><span>Panduan desain</span><span class="p">docs/08-DESIGN.md</span></div>
+          <div class="frow"><span>Panduan logo</span><span class="p">brand/final/GUIDELINES.md</span></div>
+          <div class="frow" style="border-bottom:0;"><span>Ringkasan produk</span><span class="p">PRODUCT.md</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>MilkGraph &middot; aset visual</span><span>26 November 2026</span></div>
+</section>
+
+</body>
+</html>
