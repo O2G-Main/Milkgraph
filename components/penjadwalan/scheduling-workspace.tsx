@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, type ReactNode } from "react";
-import { ArrowLeft, ChevronLeft, ChevronRight, Plus, RefreshCw } from "lucide-react";
+import { ArrowLeft, ChevronRight, Plus, RefreshCw } from "lucide-react";
 import { Card, Icon, Modal, PageHeading } from "@/components/ui";
 import { DateField } from "@/components/ui/fields";
 import { ProductionBatchForm } from "@/components/produksi/production-batch-form";
@@ -29,6 +29,7 @@ const dayNumber = (value: string) => new Date(`${value}T00:00:00Z`).toLocaleDate
 
 export function SchedulingWorkspace({ initialDate, role, tools }: { initialDate: string; role: string; tools: ReactNode }) {
   const [date, setDate] = useState(initialDate);
+  const [previewDate, setPreviewDate] = useState<string | null>(null);
   const [calendarMonth, setCalendarMonth] = useState(initialDate.slice(0, 7));
   const [panel, setPanel] = useState<"batch" | "tools" | "targets" | null>(null);
   const [saved, setSaved] = useState(false);
@@ -52,7 +53,7 @@ export function SchedulingWorkspace({ initialDate, role, tools }: { initialDate:
   const actual = history.data && !history.error && !history.loading
     ? (outputGroups ?? []).reduce((sum, group) => sum + group.total.pengisian_l, 0) : null;
   const targetsReady = weekly.data && !weekly.error && !weekly.loading;
-  const choose = (value: string) => { if (value) { setDate(value); setCalendarMonth(value.slice(0, 7)); setSaved(false); } };
+  const choose = (value: string) => { if (value) { setDate(value); setPreviewDate(null); setCalendarMonth(value.slice(0, 7)); setSaved(false); } };
 
   const openDay = (day: string) => {
     choose(day); setDetailOpen(true);
@@ -73,15 +74,8 @@ export function SchedulingWorkspace({ initialDate, role, tools }: { initialDate:
     <div className={styles.toolbar}>
       <div className={styles.dateFilter} role="group" aria-label="Filter tanggal">
         <span className={styles.filterLabel}>Filter tanggal</span>
-        <div className={styles.filterControls}>
-          <div className={styles.weekControl}>
-            <button className="icon-button" aria-label="Minggu sebelumnya" onClick={() => choose(moveDate(date, -7))}><Icon icon={ChevronLeft} /></button>
-            <span aria-live="polite">{weekLabel(start, end)}</span>
-            <button className="icon-button" aria-label="Minggu berikutnya" onClick={() => choose(moveDate(date, 7))}><Icon icon={ChevronRight} /></button>
-          </div>
-          <div className={styles.date}><span>Tanggal produksi</span><DateField label="Tanggal penjadwalan" value={date} onChange={choose} /></div>
-          <button className="text-link" onClick={() => choose(dateInWib())}>Hari ini</button>
-        </div>
+        <DateField label="Tanggal penjadwalan" value={date} onChange={choose} clearable={false}
+          weekNavigation={{ label: weekLabel(start, end), onShift: weeks => { const next = moveDate(date, weeks * 7); choose(next); return next; }, onToday: () => choose(dateInWib()) }} />
       </div>
     </div>
     {saved && <p className="ok-text" role="status">Batch tersimpan. Jadwal diperbarui dari server.</p>}
@@ -117,12 +111,12 @@ export function SchedulingWorkspace({ initialDate, role, tools }: { initialDate:
         <Card>
           <div ref={calendarReturn}>
             <ProductionCalendar date={date} month={calendarMonth} today={dateInWib()} onMonthChange={choose} onSelect={choose}
-              onPreview={day => { setDate(day); setSaved(false); }} />
+              onPreview={setPreviewDate} />
           </div>
         </Card>
-        <Card className={styles.selectedCondition} aria-label="Kondisi tanggal terpilih" aria-live="polite">
-          <h3>{dayName(date)}, {dayNumber(date)}</h3>
-          <DayConditionSummary date={date} detailed />
+        <Card className={styles.selectedCondition} aria-label={previewDate ? "Pratinjau kondisi tanggal" : "Kondisi tanggal terpilih"} aria-live="polite">
+          <h3>{dayName(previewDate ?? date)}, {dayNumber(previewDate ?? date)}</h3>
+          <DayConditionSummary date={previewDate ?? date} detailed />
         </Card>
       </div>
       <Card className={styles.weekOverview}>

@@ -22,29 +22,60 @@ try {
   await page.getByRole('button', { name: 'Masuk', exact: true }).click();
   await page.waitForURL(`${root}/`);
 
-  for (const width of [390, 768, 1440]) {
+  for (const width of [320, 390, 768, 1440]) {
     await page.setViewportSize({ width, height: 812 });
     await page.goto(`${root}/penjadwalan`);
+    // Next's dev-only bottom badge overlaps this popup at 320px; production has no badge.
+    await page.addStyleTag({ content: 'nextjs-portal { pointer-events: none !important; }' });
     const filter = page.getByRole('group', { name: 'Filter tanggal' });
     await filter.waitFor();
-    const week = filter.locator('span[aria-live="polite"]');
-    const initialWeek = await week.innerText();
-    assert.ok(await filter.getByRole('button', { name: 'Tanggal penjadwalan' }).isVisible());
-    assert.ok(await filter.getByRole('button', { name: 'Hari ini' }).isVisible());
+    const trigger = filter.getByRole('button', { name: 'Tanggal penjadwalan' });
+    assert.ok(await trigger.isVisible());
+    assert.equal(await page.getByRole('button', { name: 'Minggu sebelumnya' }).count(), 0, 'Week slider must live inside dropdown');
+    assert.equal(await page.getByRole('button', { name: 'Hari ini' }).count(), 0, 'Today belongs in date dropdown');
     const layout = await filter.evaluate(element => {
       const rect = element.getBoundingClientRect();
       return { left: rect.left, right: rect.right, viewport: window.innerWidth,
         overflow: document.documentElement.scrollWidth > window.innerWidth };
     });
     assert.ok(layout.left >= 0 && layout.right <= width && !layout.overflow, `Filter overflowing at ${width}: ${JSON.stringify(layout)}`);
-    await filter.getByRole('button', { name: 'Minggu sebelumnya' }).click();
+    await trigger.click();
+    const dialog = page.getByRole('dialog', { name: 'Tanggal penjadwalan' });
+    const week = dialog.locator('[aria-label="Navigasi minggu"] [aria-live="polite"]');
+    const initialWeek = await week.innerText();
+    const popup = await dialog.evaluate(el => {
+      const rect = el.closest('.field-popover').getBoundingClientRect();
+      return { left: rect.left, right: rect.right, viewport: window.innerWidth };
+    });
+    assert.ok(popup.left >= 0 && popup.right <= width, `Date dropdown overflowing at ${width}: ${JSON.stringify(popup)}`);
+    if (process.env.QA_ARTIFACT_DIR && width === 390) await page.screenshot({ path: `${process.env.QA_ARTIFACT_DIR}/penjadwalan-filter-open.png` });
+    await dialog.getByRole('button', { name: 'Minggu sebelumnya' }).click();
     assert.notEqual(await week.innerText(), initialWeek, 'Previous week did not change the filter');
-    await filter.getByRole('button', { name: 'Tanggal penjadwalan' }).click();
-    const day = page.getByRole('dialog', { name: 'Tanggal penjadwalan' }).getByRole('gridcell', { name: '14', exact: true });
+    assert.equal(await trigger.getAttribute('aria-expanded'), 'true', 'Slider should keep dropdown open');
+    await dialog.getByRole('button', { name: 'Minggu berikutnya' }).click();
+    assert.equal(await week.innerText(), initialWeek, 'Next week did not restore the filter');
+    const day = dialog.getByRole('gridcell', { name: '1', exact: true });
     await day.click();
-    assert.equal(await filter.getByRole('button', { name: 'Tanggal penjadwalan' }).getAttribute('aria-expanded'), 'false');
-    await filter.getByRole('button', { name: 'Hari ini' }).click();
+    assert.equal(await trigger.getAttribute('aria-expanded'), 'false');
+    await trigger.click();
+    const selectedMonth = await dialog.locator('.cal-head strong').innerText();
+    await dialog.getByRole('button', { name: 'Minggu sebelumnya' }).click();
+    assert.notEqual(await dialog.locator('.cal-head strong').innerText(), selectedMonth, 'Week navigation did not follow the previous month');
+    await dialog.getByRole('button', { name: 'Hari ini' }).click();
+    assert.equal(await trigger.getAttribute('aria-expanded'), 'false');
+    if (width === 1440) {
+      const selectedDate = await trigger.innerText();
+      await page.locator('[data-date]').first().hover();
+      await page.waitForTimeout(250);
+      assert.equal(await trigger.innerText(), selectedDate, 'Calendar hover must not change the selected date filter');
+    }
+    await trigger.click();
     assert.equal(await week.innerText(), initialWeek, 'Hari ini did not reset the week');
+    await dialog.press('Escape');
+    assert.equal(await trigger.getAttribute('aria-expanded'), 'false');
+    const bodySize = await page.locator('[class*="metricNote"]').first().evaluate(el => parseFloat(getComputedStyle(el).fontSize));
+    const daySize = await page.locator('[class*="days"] small').first().evaluate(el => parseFloat(getComputedStyle(el).fontSize));
+    assert.ok(bodySize >= 15 && daySize >= 15, `Small scheduling text at ${width}: ${bodySize}/${daySize}`);
     if (process.env.QA_ARTIFACT_DIR) await page.screenshot({ path: `${process.env.QA_ARTIFACT_DIR}/penjadwalan-${width}.png`, fullPage: true });
   }
   const count = page.locator('[class*="planSummary"] strong');
@@ -58,7 +89,18 @@ try {
   const table = page.locator('dialog .schedule-table').first();
   if (await table.count()) {
     const font = await table.evaluate(el => parseFloat(getComputedStyle(el).fontSize));
-    assert.ok(font >= 14, `Scheduling table text too small: ${font}`);
+    assert.ok(font >= 15, `Scheduling table text too small: ${font}`);
   }
-  console.log('PASS: unified left date filter, week/calendar/today synchronization, responsive layout, proposal count and table typography');
+  const smallText = page.locator('dialog p.small').first();
+  if (await smallText.count()) {
+    const font = await smallText.evaluate(el => parseFloat(getComputedStyle(el).fontSize));
+    assert.ok(font >= 15, `Scheduling dialog helper text too small: ${font}`);
+  }
+  await page.setViewportSize({ width: 390, height: 500 });
+  await page.goto(`${root}/penjadwalan`);
+  await page.addStyleTag({ content: 'nextjs-portal { pointer-events: none !important; }' });
+  await page.getByRole('button', { name: 'Tanggal penjadwalan' }).click();
+  await page.getByRole('dialog', { name: 'Tanggal penjadwalan' }).getByRole('button', { name: 'Hari ini' }).click();
+  assert.equal(await page.getByRole('button', { name: 'Tanggal penjadwalan' }).getAttribute('aria-expanded'), 'false');
+  console.log('PASS: week slider and today inside date dropdown, week/calendar synchronization, responsive layout, proposal count and table typography');
 } finally { await browser.close(); }

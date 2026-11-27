@@ -20,7 +20,7 @@ const iso = (value: Date) => value.toISOString().slice(0, 10);
 
 export function ProductionCalendar({ date, month, today, onMonthChange, onSelect, onPreview }: {
   date: string; month: string; today: string;
-  onMonthChange: (date: string) => void; onSelect: (date: string) => void; onPreview: (date: string) => void;
+  onMonthChange: (date: string) => void; onSelect: (date: string) => void; onPreview: (date: string | null) => void;
 }) {
   const grid = useRef<HTMLDivElement>(null);
   const reducedMotion = useReducedMotion();
@@ -73,7 +73,8 @@ export function ProductionCalendar({ date, month, today, onMonthChange, onSelect
     </header>
     <div className={styles.weekdays} aria-hidden="true">{["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"].map(day => <span key={day}>{day}</span>)}</div>
     <motion.div key={month} initial={{ opacity: reducedMotion ? 1 : 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.18 }}>
-      <div role="grid" aria-label={monthLabel} ref={grid} onKeyDown={navigate}>
+      <div role="grid" aria-label={monthLabel} ref={grid} onKeyDown={navigate}
+        onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) onPreview(null); }}>
         {Array.from({ length: 6 }, (_, week) => <div key={week} role="row" className={styles.calendarWeek}>
           {cells.slice(week * 7, week * 7 + 7).map(day => <div role="gridcell" key={day} aria-selected={day === date}>
             <CalendarDate date={day} type="button" tabIndex={day === date ? 0 : -1}
@@ -84,9 +85,9 @@ export function ProductionCalendar({ date, month, today, onMonthChange, onSelect
                 clearPreview();
                 previewTimer.current = setTimeout(() => onPreview(day), 200);
               }}
-              onPointerLeave={clearPreview}
+              onPointerLeave={() => { clearPreview(); onPreview(null); }}
               onFocus={() => { clearPreview(); onPreview(day); }}
-              onClick={() => { clearPreview(); onSelect(day); }} />
+              onClick={() => { clearPreview(); onPreview(null); onSelect(day); }} />
           </div>)}
         </div>)}
       </div>
@@ -94,6 +95,6 @@ export function ProductionCalendar({ date, month, today, onMonthChange, onSelect
     <ul className={styles.conditionLegend} aria-label="Arti penanda tanggal">
       {(["complete", "scheduled", "risk", "action", "empty", "unknown", "error"] as DayConditionKind[]).map(kind => <li key={kind} className={styles.legendItem} data-condition={kind}><ConditionIndicator kind={kind} />{conditionLabels[kind]}</li>)}
     </ul>
-    <p className="small muted">Arahkan kursor atau pilih tanggal untuk melihat ringkasan minggu. Buka detail harian melalui daftar jadwal.</p>
+    <p className="small muted">Arahkan kursor untuk melihat kondisi tanggal. Pilih tanggal untuk mengubah minggu, atau buka detail melalui daftar jadwal.</p>
   </div>;
 }

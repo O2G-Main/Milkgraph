@@ -148,10 +148,13 @@ export function formatDate(value: string) {
 }
 
 /** Pemilih tanggal. Nilai berformat YYYY-MM-DD, sama seperti <input type="date">; string kosong berarti belum dipilih. */
-export function DateField({ value, onChange, placeholder = "Pilih tanggal", label, id, initialMonth }: { value: string; onChange: (value: string) => void; placeholder?: string; label?: string; id?: string; initialMonth?: string }) {
+export function DateField({ value, onChange, placeholder = "Pilih tanggal", label, id, initialMonth, weekNavigation, clearable = true }: {
+  value: string; onChange: (value: string) => void; placeholder?: string; label?: string; id?: string; initialMonth?: string;
+  weekNavigation?: { label: string; onShift: (weeks: number) => string; onToday: () => void }; clearable?: boolean;
+}) {
   const [open, setOpen] = useState(false);
   const close = useCallback(() => setOpen(false), []);
-  const { trigger, panel, place } = usePopover(open, close, 280, 400);
+  const { trigger, panel, place } = usePopover(open, close, 280, weekNavigation ? 470 : 400);
   const base = () => value || initialMonth || iso(new Date().getFullYear(), new Date().getMonth(), 1);
   const [view, setView] = useState(() => monthOf(base()));
   const first = (new Date(view.y, view.m, 1).getDay() + 6) % 7;
@@ -168,8 +171,16 @@ export function DateField({ value, onChange, placeholder = "Pilih tanggal", labe
       <span className={value ? "field-value" : "field-value placeholder"}>{value ? formatDate(value) : placeholder}</span>
       <Icon icon={ChevronDown} size={16} className="field-caret" />
     </button>
-    <Popover place={place} panelRef={panel} label={label ?? placeholder} className="field-calendar">
+    <Popover place={place} panelRef={panel} label={label ?? placeholder} className={`field-calendar ${weekNavigation ? "schedule-calendar" : ""}`}>
       <div role="dialog" aria-label={label ?? placeholder} onKeyDown={e => { if (e.key === "Escape") pick(value); }}>
+        {weekNavigation && <div className="cal-week" role="group" aria-label="Navigasi minggu">
+          <span>Minggu produksi</span>
+          <div className="cal-week-controls">
+            <button type="button" className="icon-button" aria-label="Minggu sebelumnya" onClick={() => setView(monthOf(weekNavigation.onShift(-1)))}><Icon icon={ChevronLeft} size={16} /></button>
+            <strong aria-live="polite">{weekNavigation.label}</strong>
+            <button type="button" className="icon-button" aria-label="Minggu berikutnya" onClick={() => setView(monthOf(weekNavigation.onShift(1)))}><Icon icon={ChevronRight} size={16} /></button>
+          </div>
+        </div>}
         <div className="cal-head">
           <button type="button" className="icon-button" aria-label="Bulan sebelumnya" onClick={() => shift(-1)}><Icon icon={ChevronLeft} size={16} /></button>
           <strong aria-live="polite">{MONTHS[view.m]} {view.y}</strong>
@@ -183,7 +194,11 @@ export function DateField({ value, onChange, placeholder = "Pilih tanggal", labe
             return <button key={v} type="button" role="gridcell" aria-selected={v === value} className={v === value ? "selected" : ""} onClick={() => pick(v)}>{d}</button>;
           })}
         </div>
-        <div className="cal-foot"><button type="button" className="text-link" onClick={() => pick("")}>Kosongkan</button><button type="button" className="text-link" onClick={() => pick(value)}>Tutup</button></div>
+        <div className="cal-foot">
+          {weekNavigation && <button type="button" className="text-link" onClick={() => { weekNavigation.onToday(); close(); trigger.current?.focus(); }}>Hari ini</button>}
+          {clearable && <button type="button" className="text-link" onClick={() => pick("")}>Kosongkan</button>}
+          <button type="button" className="text-link" onClick={() => pick(value)}>Tutup</button>
+        </div>
       </div>
     </Popover>
   </>;

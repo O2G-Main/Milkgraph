@@ -1501,6 +1501,13 @@ button.plan-metric.selected { box-shadow: var(--glass-rim), 0 0 0 2px var(--colo
 .field-empty { padding: 12px 10px; color: var(--color-on-surface-muted); font-size: 13px; }
 .field-calendar, .field-time { padding: 10px; }
 .field-calendar { overflow-y: auto; overscroll-behavior: contain; }
+.cal-week { display: grid; gap: 4px; padding-bottom: 8px; margin-bottom: 8px; border-bottom: 1px solid var(--color-border); font-size: 15px; }
+.cal-week-controls { display: grid; grid-template-columns: 40px minmax(0, 1fr) 40px; gap: 4px; align-items: center; text-align: center; }
+.cal-week-controls strong { font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.schedule-calendar .cal-head strong { font-size: 16px; }
+.schedule-calendar .cal-dow { font-size: 14px; }
+.schedule-calendar .cal-grid button { min-height: 40px; font-size: 15px; }
+.schedule-calendar .cal-foot .text-link { font-size: 15px; }
 .cal-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
 .cal-head strong { font-size: 14px; }
 .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
