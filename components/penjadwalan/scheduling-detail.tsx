@@ -8,11 +8,12 @@ import type { PlanningList, FulfillmentPrediction } from "@/lib/api/planning";
 import { planningPath } from "@/lib/api/planning";
 import type { ProductionScheduleRow } from "@/lib/api/production";
 import { usePlanningSelection } from "@/components/rencana/planning-state";
+import styles from "./scheduling.module.css";
 
 export function SchedulingDetail({ row, role, onClose }: { row: ProductionScheduleRow; role: string; onClose: () => void }) {
   const predictions = useResource<PlanningList<FulfillmentPrediction>>(planningPath("predictions", { date: row.production_date, batch_id: row.batch_id }));
   const planning = usePlanningSelection();
-  return <Modal title={row.batch_code} onClose={onClose} className="schedule-detail">
+  return <Modal title={row.batch_code} onClose={onClose} className={`schedule-detail ${styles.detailDialog}`}>
     <p className="small muted">{row.production_date} WIB · Urutan {row.sequence_no} · {row.status}</p>
     <dl className="scheduling-facts">
       {[["Produk", row.finished_sku_id], ["PO", row.production_order_id], ["Lini filling", row.filling_line_id],

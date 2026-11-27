@@ -71,13 +71,18 @@ export function SchedulingWorkspace({ initialDate, role, tools }: { initialDate:
       </div>
     </PageHeading>
     <div className={styles.toolbar}>
-      <div className={styles.weekControl}>
-        <button className="icon-button" aria-label="Minggu sebelumnya" onClick={() => choose(moveDate(date, -7))}><Icon icon={ChevronLeft} /></button>
-        <span>{weekLabel(start, end)}</span>
-        <button className="icon-button" aria-label="Minggu berikutnya" onClick={() => choose(moveDate(date, 7))}><Icon icon={ChevronRight} /></button>
+      <div className={styles.dateFilter} role="group" aria-label="Filter tanggal">
+        <span className={styles.filterLabel}>Filter tanggal</span>
+        <div className={styles.filterControls}>
+          <div className={styles.weekControl}>
+            <button className="icon-button" aria-label="Minggu sebelumnya" onClick={() => choose(moveDate(date, -7))}><Icon icon={ChevronLeft} /></button>
+            <span aria-live="polite">{weekLabel(start, end)}</span>
+            <button className="icon-button" aria-label="Minggu berikutnya" onClick={() => choose(moveDate(date, 7))}><Icon icon={ChevronRight} /></button>
+          </div>
+          <div className={styles.date}><span>Tanggal produksi</span><DateField label="Tanggal penjadwalan" value={date} onChange={choose} /></div>
+          <button className="text-link" onClick={() => choose(dateInWib())}>Hari ini</button>
+        </div>
       </div>
-      <label className={styles.date}>Tanggal produksi<DateField label="Tanggal penjadwalan" value={date} onChange={choose} /></label>
-      <button className="text-link" onClick={() => choose(dateInWib())}>Hari ini</button>
     </div>
     {saved && <p className="ok-text" role="status">Batch tersimpan. Jadwal diperbarui dari server.</p>}
     <div className={styles.metrics}>
@@ -86,7 +91,7 @@ export function SchedulingWorkspace({ initialDate, role, tools }: { initialDate:
         ["Terjadwal", scheduled, "Target batch pada tujuh hari terpilih"],
         ["Hasil pengisian", actual, "Kelompok historis yang selesai minggu ini"],
         ["Belum terhubung", targetsReady ? totals.unlinked : null, "Target usulan tanpa batch terhubung"],
-      ] as [string, number | null, string][]).map(([label, value, detail]) => <Card key={label}><span className="small muted">{label}</span><strong title={liters(value)} aria-label={liters(value)}><span className={styles.metricFull}>{liters(value)}</span><span className={styles.metricCompact} aria-hidden="true">{compactLiters(value)}</span></strong><span className="small muted">{detail}</span></Card>)}
+      ] as [string, number | null, string][]).map(([label, value, detail]) => <Card key={label}><span className={styles.metricLabel}>{label}</span><strong title={liters(value)} aria-label={liters(value)}><span className={styles.metricFull}>{liters(value)}</span><span className={styles.metricCompact} aria-hidden="true">{compactLiters(value)}</span></strong><span className={styles.metricNote}>{detail}</span></Card>)}
     </div>
     {(weekly.error || history.error || resources.some(resource => resource.error)) && <div role="alert" className={styles.warning}>
       <p>Sebagian ringkasan minggu belum dapat dimuat. Nilai terkait ditampilkan sebagai belum tersedia.</p>
@@ -95,7 +100,8 @@ export function SchedulingWorkspace({ initialDate, role, tools }: { initialDate:
       }}><Icon icon={RefreshCw} size={14} />Coba lagi</button>
     </div>}
     <div className={styles.planSummary}>
-      <span>{targetsReady ? `${totals.proposals.length} usulan mingguan` : "Memuat usulan mingguan…"}</span>
+      {targetsReady ? <strong><span>{new Intl.NumberFormat("id-ID").format(totals.proposals.length)}</span> usulan mingguan</strong>
+        : <span role="status">Memuat usulan mingguan…</span>}
       <button className="text-link" onClick={() => setPanel("targets")}>Lihat target & alokasi</button>
     </div>
     {detailOpen ? <>
