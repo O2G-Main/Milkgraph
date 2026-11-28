@@ -20,9 +20,26 @@
 .decisions button { min-height: 44px; }
 .confirm { padding: 4px 24px 24px; }
 .confirm p { margin-bottom: 14px; }
+.kpiStrip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.kpiItem { padding: 14px 16px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-canvas); display: grid; gap: 4px; }
+.kpiLabel { font-size: 13px; color: var(--color-on-surface-muted); }
+.kpiValue { font-size: 24px; line-height: 1.15; font-weight: 600; font-variant-numeric: tabular-nums; }
+.kpiMeta { font-size: 12px; color: var(--color-on-surface-muted); }
+.assetChips { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 14px; }
+.assetChip { display: inline-flex; align-items: center; min-height: 36px; padding: 0 12px; border: 1px solid var(--color-border); border-radius: var(--radius-full); background: var(--color-surface); color: var(--color-on-surface); font: inherit; font-size: 13px; font-weight: 500; cursor: pointer; }
+.assetChip:hover { background: var(--color-accent-soft); color: var(--color-primary); border-color: color-mix(in oklab, var(--color-primary) 35%, transparent); }
+.assetChip:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.assetChipActive { background: var(--color-accent-soft); color: var(--color-primary); border-color: color-mix(in oklab, var(--color-primary) 45%, transparent); font-weight: 600; }
+.selectedGrid { display: grid; gap: 12px; margin-top: 12px; }
+.selectedItem { padding: 14px 16px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-canvas); display: grid; gap: 6px; }
+.selectedHeader { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.selectedMeta { display: flex; flex-wrap: wrap; gap: 12px; font-size: 13px; color: var(--color-on-surface-muted); }
+@media (max-width: 960px) { .kpiStrip { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 640px) {
   .page { gap: 16px; }
   .field { min-width: 0; flex-basis: 100%; }
   .filters > button { width: 100%; min-height: 44px; }
   .confirm { padding: 4px 16px 16px; }
+  .kpiStrip { grid-template-columns: minmax(0, 1fr); }
+  .assetChip { min-height: 44px; }
 }

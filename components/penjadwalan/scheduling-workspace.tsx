@@ -1,8 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useRef, useState, type ReactNode } from "react";
 import { ArrowLeft, ChevronLeft, ChevronRight, Plus, RefreshCw } from "lucide-react";
-import { Button, Card, Icon, Modal, PageHeading } from "@/components/ui";
+import { Button, Card, Icon, Modal, PageHeading, buttonClass } from "@/components/ui";
 import { DateField } from "@/components/ui/fields";
 import { ProductionBatchForm } from "@/components/produksi/production-batch-form";
 import { useResource } from "@/lib/api/resource";
@@ -13,7 +14,8 @@ import { dateInWib, completedOnProductionDate } from "@/lib/production-date";
 import type { BeTraceHistory } from "@/lib/api/trace-historis";
 import { moveDate, scheduledVolume, uniqueSchedule, weeklyTargets } from "@/lib/scheduling";
 import { useWeekSchedule } from "./use-week-schedule";
-import { DayConditionSummary } from "./day-condition-summary";
+import { useDayCondition } from "./use-day-condition";
+import { DayConditionSummary, needsUpgradeRecommendation } from "./day-condition-summary";
 import { ProductionCalendar } from "./production-calendar";
 import { SchedulingBoard } from "./scheduling-board";
 import styles from "./scheduling.module.css";
@@ -26,6 +28,33 @@ const weekLabel = (start: string, end: string) => new Intl.DateTimeFormat("id-ID
 }).formatRange(new Date(`${start}T00:00:00Z`), new Date(`${end}T00:00:00Z`));
 const dayName = (value: string) => new Date(`${value}T00:00:00Z`).toLocaleDateString("id-ID", { timeZone: "UTC", weekday: "short" });
 const dayNumber = (value: string) => new Date(`${value}T00:00:00Z`).toLocaleDateString("id-ID", { timeZone: "UTC", day: "numeric", month: "short" });
+
+function DayPreviewRow({
+  day,
+  selected,
+  resource,
+  onOpen,
+}: {
+  day: string;
+  selected: boolean;
+  resource: ReturnType<typeof useWeekSchedule>["resources"][number];
+  onOpen: (day: string) => void;
+}) {
+  const { condition } = useDayCondition(day, false);
+  const volume = resource.data && !resource.error && !resource.loading ? scheduledVolume(resource.data.items) : null;
+  const showUpgrade = needsUpgradeRecommendation(condition);
+  return <div className={`${styles.dayRow} ${selected ? styles.selected : ""}`} aria-current={selected ? "date" : undefined}>
+    <span>{dayName(day)}</span><strong>{dayNumber(day)}</strong>
+    <span className={styles.rowSummary}>
+      <small>{!resource.loading && !resource.error && resource.data ? `${new Set(uniqueSchedule(resource.data.items).map(row => row.batch_id)).size} batch · ` : ""}{resource.error ? "Gagal dimuat" : resource.loading ? "Memuat…" : liters(volume)}</small>
+      <DayConditionSummary date={day} />
+    </span>
+    <div className={styles.rowActions}>
+      {showUpgrade && <Link className={buttonClass("primary", false, styles.upgradeLink)} href={`/rencana/upgrade?date=${day}`}>Rekomendasi upgrade</Link>}
+      <Button variant="secondary" className={styles.detailLink} aria-label={`Detail jadwal ${dayName(day)}, ${dayNumber(day)}`} onClick={() => onOpen(day)}>Detail<Icon icon={ChevronRight} size={14} /></Button>
+    </div>
+  </div>;
+}
 
 export function SchedulingWorkspace({ initialDate, role, tools }: { initialDate: string; role: string; tools: ReactNode }) {
   const [date, setDate] = useState(initialDate);
@@ -123,15 +152,9 @@ export function SchedulingWorkspace({ initialDate, role, tools }: { initialDate:
       <h2>Pratinjau jadwal mingguan</h2>
       <p className="small muted">{weekLabel(start, end)}</p>
       <nav className={styles.days} aria-label="Hari produksi">
-      {days.map((day, dayIndex) => {
-        const resource = resources[dayIndex];
-        const volume = resource.data && !resource.error && !resource.loading ? scheduledVolume(resource.data.items) : null;
-        return <div key={day} className={`${styles.dayRow} ${day === date ? styles.selected : ""}`} aria-current={day === date ? "date" : undefined}>
-          <span>{dayName(day)}</span><strong>{dayNumber(day)}</strong>
-          <span className={styles.rowSummary}><small>{!resource.loading && !resource.error && resource.data ? `${new Set(uniqueSchedule(resource.data.items).map(row => row.batch_id)).size} batch · ` : ""}{resource.error ? "Gagal dimuat" : resource.loading ? "Memuat…" : liters(volume)}</small><DayConditionSummary date={day} /></span>
-          <Button variant="secondary" className={styles.detailLink} aria-label={`Detail jadwal ${dayName(day)}, ${dayNumber(day)}`} onClick={() => openDay(day)}>Detail<Icon icon={ChevronRight} size={14} /></Button>
-        </div>;
-      })}
+      {days.map((day, dayIndex) => (
+        <DayPreviewRow key={day} day={day} selected={day === date} resource={resources[dayIndex]} onOpen={openDay} />
+      ))}
       </nav>
       </Card>
     </div>}

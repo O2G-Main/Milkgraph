@@ -67,12 +67,15 @@
 }
 
 @media (max-width: 640px) {
-  .dayRow { grid-template-columns: 28px minmax(0, 1fr) auto; }
+  .dayRow { grid-template-columns: 28px minmax(0, 1fr); }
   .days .rowSummary { grid-column: 2; }
-  .days .detailLink { grid-column: 3; grid-row: 1 / span 2; }
+  .days .rowActions { grid-column: 2; justify-content: flex-start; }
 }
 
 .rowSummary, .dayCondition { display: grid; gap: 4px; min-width: 0; }
+.rowActions { display: flex; align-items: center; justify-content: flex-end; gap: 6px; flex-wrap: wrap; }
+.upgradeLink { font-size: 12px; padding: 6px 10px; min-height: 32px; white-space: nowrap; }
+.conditionAction { justify-self: start; margin-top: 4px; }
 .days .rowSummary small { grid-column: auto; }
 .conditionLabel { display: inline-flex; align-items: center; gap: 4px; color: var(--condition-text); font-size: 12px; }
 .conditionLabel svg { flex: none; }

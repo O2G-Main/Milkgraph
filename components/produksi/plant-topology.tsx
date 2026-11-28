@@ -19,10 +19,17 @@ import styles from "./plant-topology.module.css";
 
 const nodeTypes = { "plant-asset": PlantAssetNode, stage: oldNodeTypes.stage };
 
-export function PlantTopology({ assignmentCounts = {}, selectedAsset, onAssetSelect, showStatusDetails = false, fitFocusedAssets = false, focusDescription, focusAssets = [], title = "Alur pabrik", subtitle = "Konfigurasi alat saat ini dari master pabrik. Tampilan ini tidak mengikuti filter tanggal prediksi." }: {
+export type AssetHighlight = {
+  badge: string;
+  detail?: string;
+  source?: string;
+};
+
+export function PlantTopology({ assignmentCounts = {}, assetHighlights, selectedAsset, onAssetSelect, showStatusDetails = false, fitFocusedAssets = false, focusDescription, focusAssets = [], title = "Alur pabrik", subtitle = "Konfigurasi alat saat ini dari master pabrik. Tampilan ini tidak mengikuti filter tanggal prediksi." }: {
   focusAssets?: string[]; title?: string; subtitle?: string;
-  assignmentCounts?: Record<string, number>; selectedAsset?: string | null;
-  onAssetSelect?: (id: string | null) => void; showStatusDetails?: boolean; fitFocusedAssets?: boolean; focusDescription?: string;
+  assignmentCounts?: Record<string, number>; assetHighlights?: Record<string, AssetHighlight>;
+  selectedAsset?: string | null; onAssetSelect?: (id: string | null) => void;
+  showStatusDetails?: boolean; fitFocusedAssets?: boolean; focusDescription?: string;
 }) {
   const topology = useResource<PlantTopologyData>("/master/topology");
   const assets = useResource<ProductionList<ProductionAsset>>("/production/assets", { fetchOnMount: !showStatusDetails });
@@ -84,6 +91,18 @@ export function PlantTopology({ assignmentCounts = {}, selectedAsset, onAssetSel
   }));
   const picked = topology.data?.nodes.find(asset => asset.asset_id === selected);
   const pickedRoutes = topology.data && selected ? connectedRoutes(topology.data, selected) : [];
+  const pickedHighlight = picked ? assetHighlights?.[picked.asset_id] : undefined;
+  const flowBadges = useMemo(() => {
+    const result: Record<string, string> = showStatusDetails
+      ? Object.fromEntries(Object.entries(assignmentCounts).map(([id, count]) => [id, `${count} batch`]))
+      : {};
+    if (assetHighlights) {
+      for (const [id, highlight] of Object.entries(assetHighlights)) {
+        result[id] = result[id] ? `${result[id]} · ${highlight.badge}` : highlight.badge;
+      }
+    }
+    return result;
+  }, [showStatusDetails, assignmentCounts, assetHighlights]);
 
   return <Card data-tour="plant-topology">
     <SectionTitle title={title} subtitle={subtitle} action={<Toggle label="Tampilan topologi" value={view} onChange={setView} options={[{ value: "diagram", label: "Alur 2D" }, { value: "3d", label: "Alur 3D" }, { value: "routes", label: "Daftar rute" }]} />} />
@@ -101,8 +120,8 @@ export function PlantTopology({ assignmentCounts = {}, selectedAsset, onAssetSel
       {graph && graph.missing.length > 0 && <p className="small crit-text" role="status">{graph.missing.length} koneksi memiliki alat yang belum tersedia di katalog. Detail tetap ada di daftar rute.</p>}
       {view !== "routes" ? !visualAssets.some(asset => visible.has(asset.id)) ? <p className="muted">{topology.data.nodes.length ? "Tidak ada alat yang cocok dengan filter." : "Data konfigurasi alat belum tersedia."}</p> : <>
         <div className={`flow-canvas ${styles.canvas}`} role="region" tabIndex={-1} aria-label="Diagram alur alat Greenfields">
-          {view === "3d" ? <Flow3D assets={visualAssets.filter(asset => visible.has(asset.id))} edges={edges.map(edge => ({ id: edge.id, source: edge.source, target: edge.target, kind: "idle" as const }))} pos={layout.pos} columns={layout.columns} badges={showStatusDetails ? Object.fromEntries(Object.entries(assignmentCounts).map(([id, count]) => [id, `${count} batch`])) : {}} picked={selected} onPick={setSelected} onClear={() => setSelected(null)} label="Alur pabrik 3D" />
-          : <ReactFlow key={`${type}:${query}:${showStatusDetails && fitFocusedAssets ? [...focusAssets].sort().join(",") : "all"}`} nodeTypes={nodeTypes} nodes={measuredNodes} onNodesChange={onNodesChange} edges={edges} defaultViewport={{ x: 24, y: 24, zoom: .9 }} fitView={showStatusDetails || Boolean(type || query)} fitViewOptions={fitViewOptions} nodesDraggable={false} nodesConnectable={false} onNodeClick={(_, node) => { if (node.type === "plant-asset") setSelected(node.id); }} minZoom={.15} maxZoom={1.8} ariaLabelConfig={{ "controls.zoomIn.ariaLabel": "Perbesar alur", "controls.zoomOut.ariaLabel": "Perkecil alur", "controls.fitView.ariaLabel": "Pas ke layar" }}>
+          {view === "3d" ? <Flow3D assets={visualAssets.filter(asset => visible.has(asset.id))} edges={edges.map(edge => ({ id: edge.id, source: edge.source, target: edge.target, kind: "idle" as const }))} pos={layout.pos} columns={layout.columns} badges={flowBadges} picked={selected} onPick={setSelected} onClear={() => setSelected(null)} label="Alur pabrik 3D" />
+          : <ReactFlow key={`${type}:${query}:${fitFocusedAssets ? focusKey || "all" : "all"}`} nodeTypes={nodeTypes} nodes={measuredNodes} onNodesChange={onNodesChange} edges={edges} defaultViewport={{ x: 24, y: 24, zoom: .9 }} fitView={showStatusDetails || fitFocusedAssets || Boolean(type || query)} fitViewOptions={fitViewOptions} nodesDraggable={false} nodesConnectable={false} onNodeClick={(_, node) => { if (node.type === "plant-asset") setSelected(node.id); }} minZoom={.15} maxZoom={1.8} ariaLabelConfig={{ "controls.zoomIn.ariaLabel": "Perbesar alur", "controls.zoomOut.ariaLabel": "Perkecil alur", "controls.fitView.ariaLabel": "Pas ke layar" }}>
             <Background gap={22} size={1} /><Controls showInteractive={false} />
           </ReactFlow>}
         </div>
@@ -110,6 +129,13 @@ export function PlantTopology({ assignmentCounts = {}, selectedAsset, onAssetSel
       </> : <><Table variant="schedule"><thead><tr><th>Rute</th><th>Dari</th><th>Ke</th><th>Melalui</th><th>Jenis aliran</th><th>Batas aliran (L/jam)</th></tr></thead><tbody>{routes.map(edge => <tr key={edge.connection_id}><td>{edge.connection_id}</td><td><Button variant="text" onClick={() => setSelected(edge.source_asset_id)}>{edge.source_asset_id}</Button></td><td><Button variant="text" onClick={() => setSelected(edge.destination_asset_id)}>{edge.destination_asset_id}</Button></td><td>{edge.via_asset_id || "Tidak dicantumkan"}</td><td>{edge.flow_type}</td><td>{edge.max_flow_lph || "Belum tersedia"}</td></tr>)}</tbody></Table>{!routes.length && <p className="muted">Tidak ada rute yang cocok.</p>}</>}
       {picked && !onAssetSelect && <div className={styles.inspector} aria-live="polite">
         <SectionTitle title={`${picked.asset_id} · ${picked.asset_name}`} subtitle={picked.asset_type} action={<Button variant="secondary" onClick={() => setSelected(null)}>Tutup detail</Button>} />
+        {pickedHighlight && (
+          <div className="callout ok" role="note">
+            <strong>{pickedHighlight.badge}</strong>
+            {pickedHighlight.source && <span> · {pickedHighlight.source}</span>}
+            {pickedHighlight.detail && <p className="small">{pickedHighlight.detail}</p>}
+          </div>
+        )}
         <dl className={styles.details}><div><dt>Status terakhir</dt><dd>{statusLabel(picked.asset_id)}</dd></div><div><dt>Kapasitas (L)</dt><dd>{picked.capacity_l || "Belum tersedia"}</dd></div><div><dt>Kecepatan proses (L/jam)</dt><dd>{picked.process_speed_lph || "Belum tersedia"}</dd></div><div><dt>Rute terkait</dt><dd>{pickedRoutes.length} rute</dd></div></dl>
         <p className="small muted">{pickedRoutes.map(edge => `${edge.source_asset_id} → ${edge.destination_asset_id}`).join(" · ") || "Belum ada koneksi tercatat."}</p>
         <Link className="text-link" href="/alat">Buka daftar dan status alat</Link>
